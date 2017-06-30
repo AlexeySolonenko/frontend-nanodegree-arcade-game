@@ -108,4 +108,17 @@
         onReady: onReady,
         isReady: isReady
     };
+    window.userVars = {
+    xCell : 101,
+    yCell : 83,
+    xCells : 5,
+    yCells : 6
+    };
+    /* var xCell = 101;
+    var yCell = 83;
+    var xCells = 5;
+    var yCells = 6;
+    */
+ 
 })();
+
