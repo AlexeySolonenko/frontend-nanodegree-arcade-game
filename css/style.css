@@ -1,3 +1,15 @@
+/*
 body {
     text-align: center;
 }
+*/
+
+.userTest{
+  border: 1px solid black;
+}
+
+.canvasDiv, .controlsDiv, .gameMenu,
+.btnUp, .btnLeft, .btnDn, .btnRight
+{}
+
+

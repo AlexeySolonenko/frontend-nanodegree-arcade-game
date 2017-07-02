@@ -1,80 +1,25 @@
-// Enemies our player must avoid
-var Enemy = function(x,y,dt) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-    this.x = 0 - userF.getRandomInt(1,5)*userVars.xCell;
-    this.speed = userF.getRandomInt(40,500);
-    this.y = y;
-};
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    this.x = this.x + dt*this.speed;
-    if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - 110)) {
-      this.x = 0 - userF.getRandomInt(1,5)*userVars.xCell;
-      this.speed = userF.getRandomInt(40,500);
-    };
-    
-};
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-var Player = function(){
-  this.sprite = 'images/char-boy.png';
-  this.x = userVars.xCell*2;
-  this.y = userVars.yCell*userVars.yCells-userVars.yCell*1.5;
-};
-
-Player.prototype.update = function(dt){
-  
-};
-Player.prototype.speed = 1;
-
-Player.prototype.render = function(){
-  ctx.drawImage(Resources.get(this.sprite),this.x,this.y);
-};
-
-Player.prototype.handleInput = function(key){
-  
-  //if((this.x<0) || (this.y<0) || (this.x > (document.body.canvas.width-this.width)));
-  
-    if((key == 'left')&&(this.x>0)) this.x = this.x-userVars.xCell*this.speed;
-    if((key == 'up')&&(this.y>0)) this.y = this.y-userVars.yCell*this.speed;
-    if((key == 'right')&&(this.x < ((document.getElementsByTagName("CANVAS")[0].width) - 110))) 
-      this.x = this.x+this.speed*userVars.xCell;
-    if((key == 'down')&& (this.y < ((document.getElementsByTagName("CANVAS")[0].width) - userVars.xCell*1.5-5))) this.y = this.y+this.speed*userVars.yCell;
-    
-};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var allEnemies = [];
-for(var i = 0;i<3;i++){
-  allEnemies[i] = new Enemy(i,((i+1)*userVars.yCell-userVars.yCell*.25));
+gd.allEnemies = [];
+for(var i = 0;i<6;i++){
+  var j = i;
+  if(j>2) j = 0;
+  gd.allEnemies[i] = new gd.EnemySoldier(i,((j+1)*userVars.yCell-userVars.yCell*.25),'images/enemy-bug.png');
 };
-var player = new Player();
+gd.player = new gd.Player('images/char-boy.png');
 var checkCollisions = function(){
-  allEnemies.forEach(function(enemy){
+  gd.allEnemies.forEach(function(enemy){
     if(
-      (Math.abs(enemy.x - player.x) < userVars.xCell)&&
-      (Math.abs(enemy.y - player.y) < userVars.yCell)
+      (Math.abs(enemy.x - gd.player.x) < userVars.xCell/2)&&
+      (Math.abs(enemy.y - gd.player.y) < userVars.yCell/2)
       )
-      {console.log('collision');}
+      {
+        console.log('collision');
+        gd.player.dying();
+      }
   });
 }
 
@@ -85,10 +30,23 @@ document.addEventListener('keyup', function(e) {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        80: 'P',
+        112: 'p'
     };
 
-    player.handleInput(allowedKeys[e.keyCode],player);
+    gd.player.handleInput(allowedKeys[e.keyCode],gd.player);
 });
 
-
+document.getElementsByClassName('btnUp')[0].onclick = function(){
+  console.log('hello');
+};
+document.getElementsByClassName('btnLeft')[0].onclick = function(){
+  console.log('hello');
+};
+document.getElementsByClassName('btnDn')[0].onclick = function(){
+  console.log('hello');
+};
+document.getElementsByClassName('btnRight')[0].onclick = function(){
+  console.log('hello');
+};

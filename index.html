@@ -4,12 +4,53 @@
     <meta charset="UTF-8">
     <title>Effective JavaScript: Frogger</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
 </head>
 <body>
+    <div class="row"> <!-- Whole game div. Put all game here. Must always fit the current screen size. -->
+      <div class="gameMenu col-xs-12 col-sm-12 col-md-1 col-lg-1 userTest">
+        <div class="row userTest">
+          <div class="userTest">
+            <button class="btn btn-default">MENU</button>
+          </div>
+          <div class="userTest">
+            <button class="btn btn-default">PAUSE</button>
+          </div>
+        </div>
+      </div>
+      <div class="canvasDiv col-xs-12 col-sm-12 col-md-8 col-lg-8 userTest" >
+        <!--Append game canvas here. Game canvas dims are calculated automatically. see js. -->
+      </div>
+      <div class="controlsDiv col-xs-12 col-sm-12 col-md-3 col-lg-3 userTest">
+      <!-- Controls div. Put arrows and other extra buttons, if any, here -->
+        <div class="row userTest">
+          <div class="userTest col-xs-offset-4 col-xs-4">
+            <button class="btnUp btn btn-lg btn-default">UP</button>
+          </div><!-- up arrow -->
+          <div class="userTest invisible col-xs-12 ">
+            <p>bla bla</p>
+          </div><!-- spacer div -->
+          <div class="userTest col-xs-4">
+            <button class="btnLeft btn-lg btn btn-default">LEFT</button>
+          </div><!-- left arrow -->
+          <div class="userTest col-xs-4">
+            <button class="btnDn btn btn-lg btn-default">DOWN</button>
+          </div><!-- down arrow -->
+          <div class="userTest col-xs-4">
+            <button class="btnRight btn-lg btn btn-default">RIGHT</button>
+          </div><!-- right arrow -->
+        </div>
+      </div><!-- Controls div. -->
+    </div><!-- Whole game div -->
     
+    <script src="js/jquery-3.2.1.slim.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     <script src="js/resources.js"></script>
     <script src="js/lib.js"></script></script> 
+    <script src="js/game_entities.js"></script>
     <script src="js/app.js"></script>
     <script src="js/engine.js"></script>
+    
 </body>
 </html>

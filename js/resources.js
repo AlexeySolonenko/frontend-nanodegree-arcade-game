@@ -109,16 +109,14 @@
         isReady: isReady
     };
     window.userVars = {
+    // xCell : 101,
+    // yCell : 83,
     xCell : 101,
     yCell : 83,
-    xCells : 5,
-    yCells : 6
+    xCells : 8,
+    yCells : 10
     };
-    /* var xCell = 101;
-    var yCell = 83;
-    var xCells = 5;
-    var yCells = 6;
-    */
+    window.gd = {} // object for storing all game data
  
 })();
 

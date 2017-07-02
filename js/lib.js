@@ -42,3 +42,35 @@ userF.cloneObjSimple = function(obj,target,arrKeys){
   
   // throw new Error("Unable to define the type of the argument. Copy has not been done.")
 };
+
+gd.paused = true;
+gd.pause = function(){
+if (gd.paused == true) {gd.paused = false} else {gd.paused = true};
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -25,10 +25,11 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
     // user defined functions
-
-    canvas.width = userVars.xCell*userVars.xCells;
+    
+    canvas.width = userVars.xCell*userVars.xCells+200;
     canvas.height = 108+userVars.yCell*userVars.yCells;
-    doc.body.appendChild(canvas);
+    doc.getElementsByClassName("canvasDiv")[0].appendChild(canvas);
+    gd.buildMock();
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -68,6 +69,8 @@ var Engine = (function(global) {
         reset();
         lastTime = Date.now();
         main();
+        //Playbutton(50,(canvas.width-100),40,40,2,#ff4433,#0011ee);
+        gd.Playbutton();
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -92,10 +95,11 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
+        gd.allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        player.update(dt);
+        gd.player.update(dt);
+        gd.buildMock();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -108,9 +112,11 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
+       // var experimentImg = gd.draw(ctx);
         var rowImages = [
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
+                // 'images/Spanish_bond.svg',
                 'images/stone-block.png',   // Row 2 of 3 of stone
                 'images/stone-block.png',   // Row 3 of 3 of stone
                 'images/grass-block.png',   // Row 1 of 2 of grass
@@ -125,6 +131,11 @@ var Engine = (function(global) {
          * portion of the "grid"
          */
         for (row = 0; row < numRows; row++) {
+          var rowImg;
+          if (row == 0){rowImg = Resources.get(rowImages[0]);}
+          else if ((row>0)&&(row<(numRows-2))){rowImg = Resources.get(rowImages[1])}
+          else {rowImg = Resources.get(rowImages[4]);};
+         
             for (col = 0; col < numCols; col++) {
                 /* The drawImage function of the canvas' context element
                  * requires 3 parameters: the image to draw, the x coordinate
@@ -133,7 +144,8 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * userVars.xCell, row * userVars.yCell);
+                // ctx.drawImage(Resources.get(rowImages[row]), col * userVars.xCell, row * userVars.yCell);
+                ctx.drawImage(rowImg, col * userVars.xCell, row * userVars.yCell);
             }
         }
 
@@ -148,11 +160,11 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
+        gd.allEnemies.forEach(function(enemy) {
             enemy.render();
         });
 
-        player.render();
+        gd.player.render();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -169,6 +181,7 @@ var Engine = (function(global) {
      */
     Resources.load([
         'images/stone-block.png',
+        'images/Spanish_bond.svg',
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
