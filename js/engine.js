@@ -149,7 +149,7 @@ var Engine = (function(global) {
                  */
                 
                 
-                ctx.drawImage(rowImg, col * gd.cellWidth, row * gd.cellHeight - gd.cellHeight/2);
+                ctx.drawImage(rowImg, col * gd.cellWidth, row * gd.cellHeight - gd.cellHeight/2,50,80);
                 
             }
         }

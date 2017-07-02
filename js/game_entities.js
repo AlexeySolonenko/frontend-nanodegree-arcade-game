@@ -45,8 +45,10 @@ else
 *
 */
 
-gd.cellWidth = 101;
-gd.cellHeight = 83;
+gd.cellWidth = 50;
+gd.cellHeight = 40;
+gd.spriteWidth = 50;
+gd.spriteHeight = 80;
 gd.numRows = 5;
 gd.numCols = 6;
 gd.windowVertical = false;
@@ -206,7 +208,7 @@ gd.Enemy.prototype.update = function(dt) {
 };
 // Draw the enemy on the screen, required method for game
 gd.Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y,gd.spriteWidth,gd.spriteHeight);
 
 };
 
@@ -279,7 +281,7 @@ gd.Player.prototype.dying = function(){
 }
  
 gd.Player.prototype.render = function(){
-  ctx.drawImage(Resources.get(this.sprite),this.x,this.y);
+  ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
 
 gd.Player.prototype.handleInput = function(key){
