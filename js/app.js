@@ -1,27 +1,22 @@
 
-
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-gd.allEnemies = [];
-for(var i = 0;i<6;i++){
-  var j = i;
-  if(j>2) j = 0;
-  gd.allEnemies[i] = new gd.EnemySoldier(i,((j+1)*userVars.yCell-userVars.yCell*.25),'images/enemy-bug.png');
-};
 gd.player = new gd.Player('images/char-boy.png');
+
 var checkCollisions = function(){
+  
   gd.allEnemies.forEach(function(enemy){
+
+    var xReach = gd.cellWidth * 0.6;
+    var yReach = gd.cellHeight * 0.6;
     if(
-      (Math.abs(enemy.x - gd.player.x) < userVars.xCell/2)&&
-      (Math.abs(enemy.y - gd.player.y) < userVars.yCell/2)
+        (Math.abs(enemy.x - gd.player.x) < xReach)&&
+        (Math.abs(enemy.y - gd.player.y) < yReach)
       )
       {
         console.log('collision');
         gd.player.dying();
       }
   });
-}
+};
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify obj.
@@ -39,14 +34,19 @@ document.addEventListener('keyup', function(e) {
 });
 
 document.getElementsByClassName('btnUp')[0].onclick = function(){
-  console.log('hello');
+  gd.player.moveUp();
 };
 document.getElementsByClassName('btnLeft')[0].onclick = function(){
-  console.log('hello');
+  gd.player.moveLeft();
 };
 document.getElementsByClassName('btnDn')[0].onclick = function(){
-  console.log('hello');
+  gd.player.moveDown();;
 };
 document.getElementsByClassName('btnRight')[0].onclick = function(){
-  console.log('hello');
+  gd.player.moveRight();
 };
+document.getElementsByClassName('btnPause')[0].onclick = function(){
+  gd.pause();
+};
+
+

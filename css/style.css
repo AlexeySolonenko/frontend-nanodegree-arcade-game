@@ -8,8 +8,10 @@ body {
   border: 1px solid black;
 }
 
-.canvasDiv, .controlsDiv, .gameMenu,
-.btnUp, .btnLeft, .btnDn, .btnRight
+.canvasDiv, .controlsDiv, .gameMenuDiv,
+.btnUp, .btnLeft, .btnDn, .btnRight, .btnPause,
+.btnSpacer, .infoPanel, .canvasContainer,
+.canvasStoneField, .screenHoriz, .screenVert
 {}
 
 

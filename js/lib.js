@@ -1,14 +1,13 @@
-var userF = {};
 
 
-userF.getRandomInt = function(min,max){
+gd.getRandomInt = function(min,max){
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max-min)) + min;
 };
 
 
-userF.cloneObjSimple = function(obj,target,arrKeys){
+gd.cloneObjSimple = function(obj,target,arrKeys){
   var copy;
   
   // Handle the 3 simple types and null or undefined
@@ -43,10 +42,7 @@ userF.cloneObjSimple = function(obj,target,arrKeys){
   // throw new Error("Unable to define the type of the argument. Copy has not been done.")
 };
 
-gd.paused = true;
-gd.pause = function(){
-if (gd.paused == true) {gd.paused = false} else {gd.paused = true};
-};
+
 
 
 

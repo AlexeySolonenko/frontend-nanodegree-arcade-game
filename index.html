@@ -8,41 +8,54 @@
     <link rel="stylesheet" href="css/bootstrap-theme.min.css">
 </head>
 <body>
+  <div class="container-fluid">
+    <div class = "row">
+      <h3 class="infoPanel panel panel-default"></h3>
+    </div>
     <div class="row"> <!-- Whole game div. Put all game here. Must always fit the current screen size. -->
-      <div class="gameMenu col-xs-12 col-sm-12 col-md-1 col-lg-1 userTest">
+      
+      <!-- game menu div -->
+      <!-- <div class="gameMenuDiv col-xs-12 col-sm-12 col-md-1 col-lg-1 userTest"> -->
+      <div class="gameMenuDiv userTest">
         <div class="row userTest">
           <div class="userTest">
-            <button class="btn btn-default">MENU</button>
+            <button class="btn btn-block btn-lg btn-default">MENU</button>
           </div>
           <div class="userTest">
-            <button class="btn btn-default">PAUSE</button>
+            <button class="btn btnPause btn-block btn-lg btn-default">PAUSE</button>
           </div>
         </div>
       </div>
-      <div class="canvasDiv col-xs-12 col-sm-12 col-md-8 col-lg-8 userTest" >
-        <!--Append game canvas here. Game canvas dims are calculated automatically. see js. -->
+      
+      <!--Append game canvas here. Game canvas dims are calculated automatically. see js. -->
+      <div class="canvasDiv center-block userTest">
+        <div class="canvasContainer userTest" >
+      
+        </div><!-- main game canvas div -->
       </div>
-      <div class="controlsDiv col-xs-12 col-sm-12 col-md-3 col-lg-3 userTest">
       <!-- Controls div. Put arrows and other extra buttons, if any, here -->
+      <div class="controlsDiv userTest">
         <div class="row userTest">
-          <div class="userTest col-xs-offset-4 col-xs-4">
-            <button class="btnUp btn btn-lg btn-default">UP</button>
+          <div class="userTest btnUp col-xs-offset-4 col-xs-4">
+            <button class="btn btn-lg btn-default btn-block">UP</button>
           </div><!-- up arrow -->
-          <div class="userTest invisible col-xs-12 ">
+          <div class="userTest btnSpacer invisible col-xs-12 ">
             <p>bla bla</p>
           </div><!-- spacer div -->
-          <div class="userTest col-xs-4">
-            <button class="btnLeft btn-lg btn btn-default">LEFT</button>
+          <div class="userTest btnLeft col-xs-4">
+            <button class="btn-lg btn btn-block btn-default">LEFT</button>
           </div><!-- left arrow -->
-          <div class="userTest col-xs-4">
-            <button class="btnDn btn btn-lg btn-default">DOWN</button>
+          <div class="userTest btnDn col-xs-4">
+            <button class="btn btn-lg btn-block btn-default">DOWN</button>
           </div><!-- down arrow -->
-          <div class="userTest col-xs-4">
-            <button class="btnRight btn-lg btn btn-default">RIGHT</button>
+          <div class="userTest btnRight col-xs-4">
+            <button class="btn-lg btn btn-block btn-default">RIGHT</button>
           </div><!-- right arrow -->
         </div>
       </div><!-- Controls div. -->
     </div><!-- Whole game div -->
+  </div><!-- main bootstrap container-fluid -->
+    <!-- TO ADD - STATUS WINDOW - NAVIGATION, PAUSE, ETC. -->
     
     <script src="js/jquery-3.2.1.slim.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
