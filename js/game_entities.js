@@ -32,7 +32,7 @@ else
 gd.landscape = {}; // object describing not-interactive, static
 // and etc. objects like stones, sands, walls, barriers, fences. etc.
 
-gd.landscape.objects = []// an array of unique stones, walls, barriers, sands, etc.
+gd.landscape.objects = [];// an array of unique stones, walls, barriers, sands, etc.
 gd.landscape.stones = {}; // properties and settings for stones
 gd.landscape.stones.numStones = 0;
 gd.landscape.stones.Enabled = true;
@@ -55,65 +55,6 @@ gd.landscape.stones.calcNumStones = function(){
   return numStones;
 };
 
-gd.landscape.LandscapeObject = function(sprite, type){
-  this.sprite = sprite;
-  this.type = type;
-  var obj1 = {};
-  obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
-  obj1.y = 0;
-  function checkY(obj){
-    obj.y = gd.cellHeight * gd.getRandomInt(0,gd.numRows);
-    if((obj.y>(gd.numRows-2)*gd.cellHeight)||(obj1.y < gd.cellHeight)){
-      obj = checkY(obj);
-      return obj;
-    } else{
-      return obj;
-    };
-  };
-  obj1 = checkY(obj1);
-  function checkCollision(obj){
-    console.log(obj);
-    var collisionCheck = '';
-    collisionCheck = gd.checkCollisions(obj,gd.landscape.objects);
-    console.log(collisionCheck);
-    collisionCheck = collisionCheck.search('collision');
-    if(collisionCheck == -1){
-      console.log('no x collisions');
-      return obj;
-    } else {
-      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
-      obj = checkY(obj);
-      console.log('x collision detected');
-      obj = checkCollision(obj);
-      return obj;
-    };    
-  };
-  obj1 = checkCollision(obj1);
-  
-  // find x, check for collisions, do not put on 
-  // water and to not put on grass
-  this.y = obj1.y;
-  this.x = obj1.x;
-};
-gd.landscape.build = function(sprite){
-  gd.landscape.stones.numStones = gd.landscape.stones.calcNumStones();
-  for(var i = 0;i<gd.landscape.stones.numStones;i++){
-    gd.landscape.objects[i] = new gd.landscape.LandscapeObject('images/Rock.png','stone');
-  };
-};
-
-gd.landscape.LandscapeObject.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y,gd.spriteWidth,gd.spriteHeight);
-
-};
-gd.landscape.renderAll = function(){
-  for(var i = 0;i < gd.landscape.objects.length;i++){
-    gd.landscape.objects[i].render();
-  };
-};
-
-gd.landscape.LandscapeObject.prototype.constructor = gd.landscape.LandscapeObject;
-
 
 gd.checkCollisions = function(obj1,obj2){
   // return array of descriptive words about
@@ -131,9 +72,8 @@ gd.checkCollisions = function(obj1,obj2){
   var yCollided = gd.cellHeight*0.6;
   var i = 0; // var for for statements iterations
   var j = 0; // var for for statements iterations
-  
   // if obj1 and obj2 are simple objects
-  if((obj1 instanceof Object)&&(obj2 instanceof Object)){
+  if((obj1 instanceof Object)&&(obj2 instanceof Object)&&(!(obj2 instanceof Array))&&(!(obj2 instanceof Array))){
     // collided / atleft / atright / atop / below 
     dtX = obj1.x - obj2.x;
     dtY = obj1.y - obj2.y;
@@ -158,16 +98,17 @@ gd.checkCollisions = function(obj1,obj2){
     };
     return result;
   };
-  
+  console.log(obj1 instanceof Array);
   // if obj1 is an array, and obj2 is an object
-  if((obj1 instanceof Array)&&(obj2 instanceof Object)){
+  if((obj1 instanceof Array)&&(obj2 instanceof Object)&&(!(obj2 instanceof Array))){
+    console.log('here');
     for(i=0;i<obj1.length;i++){
       result = result + gd.checkCollisions(obj1[i],obj2);
       return result;
     };
   };
   // if obj2 is an object and obj2 is an array
-  if((obj1 instanceof Obj)&&(obj2 instanceof Array)){
+  if((obj1 instanceof Object)&&(!(obj1 instanceof Array))&&(obj2 instanceof Array)){
     for(i=0;i<obj2.length;i++){
       result = result + gd.checkCollisions(obj1,obj2[i]);
       return result;
@@ -184,6 +125,67 @@ gd.checkCollisions = function(obj1,obj2){
   return result;
   
 };
+
+// landscape Object superClass constructor
+gd.landscape.LandscapeObject = function(sprite, type){
+  this.sprite = sprite;
+  this.type = type;
+  var obj1 = {};
+  obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
+  obj1.y = 0;
+  function checkY(obj){
+    obj.y = gd.cellHeight * gd.getRandomInt(0,gd.numRows);
+    if((obj.y>(gd.numRows-3)*gd.cellHeight)||(obj1.y < gd.cellHeight)){
+      obj = checkY(obj);
+      return obj;
+    } else{
+      return obj;
+    };
+  };
+  obj1 = checkY(obj1);
+  function checkCollision(obj){
+    var collisionCheck = '';
+    collisionCheck = gd.checkCollisions(obj,gd.landscape.objects);
+    collisionCheck = collisionCheck.search('collision');
+    if(collisionCheck == -1){
+      return obj;
+    } else {
+      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
+      obj = checkY(obj);
+      obj = checkCollision(obj);
+      return obj;
+    };    
+  };
+  obj1 = checkCollision(obj1);
+  
+  // find x, check for collisions, do not put on 
+  // water and to not put on grass
+  this.y = obj1.y;
+  this.x = obj1.x;
+};
+gd.landscape.LandscapeObject.prototype.constructor = gd.landscape.LandscapeObject;
+
+gd.landscape.LandscapeObject.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y,gd.spriteWidth,gd.spriteHeight);
+
+};
+
+gd.landscape.build = function(sprite){
+  gd.landscape.stones.numStones = gd.landscape.stones.calcNumStones();
+  for(var i = 0;i<gd.landscape.stones.numStones;i++){
+    gd.landscape.objects[i] = new gd.landscape.LandscapeObject('images/Rock.png','stone');
+  };
+};
+
+
+gd.landscape.renderAll = function(){
+  for(var i = 0;i < gd.landscape.objects.length;i++){
+    gd.landscape.objects[i].render();
+  };
+};
+
+
+
 
 
 
@@ -428,16 +430,19 @@ gd.Player.prototype.update = function(dt){
   
 };
 gd.Player.prototype.speed = 1;
+gd.Player.prototype.cannotDoIt = function(){
+  
+};
 
 gd.Player.prototype.returnToStart = function(){
   this.x = gd.cellWidth*2;
   this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
-}
+};
 
 gd.Player.prototype.dying = function(){
   // $(this).css('visibility','none');
   this.returnToStart();
-}
+};
  
 gd.Player.prototype.render = function(){
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
@@ -455,7 +460,13 @@ gd.Player.prototype.handleInput = function(key){
 };
 
 gd.Player.prototype.moveLeft = function(){
-  if(this.x>0){this.x = this.x-gd.cellWidth*gd.gamePaused};
+  var obstacleAtLeft = 'd';
+  obstacleAtLeft = gd.checkCollisions(gd.landscape.objects,this);
+  console.log('obstacle',obstacleAtLeft,'eol');
+  
+  if((this.x>0)&&(gd.checkCollisions(this,gd.landscape.objects).search('atleft') == -1))
+    {this.x = this.x-gd.cellWidth*gd.gamePaused}
+  else {this.cannotDoIt();};
 };
 
 gd.Player.prototype.moveRight = function(){
