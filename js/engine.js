@@ -27,16 +27,27 @@ var Engine = (function(global) {
     // user defined functions
     
     canvas.classList.add('canvasStoneField');
-    //canvas.classList.add('center-block');
+    canvas.classList.add('center-block');
     
     canvas.width = gd.numCols*gd.cellWidth;
     canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
-    doc.getElementsByClassName("canvasContainer")[0].appendChild(canvas);
+    doc.getElementsByClassName("canvasDiv")[0].appendChild(canvas);
     
+    // gd.landscape.stonny = new gd.landscape.LandscapeObject('images/Rock.png','stone');
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
+     
+    function loopPause(){
+      if(gd.paused){
+        loopPause();
+      }
+      else{
+       win.requestAnimationFrame(main);
+      };
+    };
+    
     function main() {
         /* Get our time delta information which is required if your game
          * requires smooth animation. Because everyone's computer processes
@@ -61,7 +72,25 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
+         
+
+     
+       // console.log(fps);
+       win.requestAnimationFrame(main);
+       
+       /*if(!gd.paused){
         win.requestAnimationFrame(main);
+       }
+       else{
+        console.log('Animation is paused');
+        loopPause();
+       };
+       */
+        /*
+        setTimeout(function(){
+          win.requestAnimationFrame(main); // a method with a call back;
+        }, timeout);
+        */
     }
 
     /* This function does some initial setup that should only occur once,
@@ -73,6 +102,7 @@ var Engine = (function(global) {
         lastTime = Date.now();
         main();
         gd.player.returnToStart();
+        gd.landscape.build();
         document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
     }
 
@@ -119,6 +149,7 @@ var Engine = (function(global) {
          */
        // var experimentImg = gd.draw(ctx);
        gd.setupGrid();
+       
        canvas.width = gd.numCols*gd.cellWidth;
        canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
         var rowImages = [
@@ -153,6 +184,8 @@ var Engine = (function(global) {
                 
             }
         }
+        // gd.landscape.stonny.render();
+        gd.landscape.renderAll();
         renderEntities();
     }
 
@@ -193,7 +226,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/Rock.png'
     ]);
     Resources.onReady(init);
 

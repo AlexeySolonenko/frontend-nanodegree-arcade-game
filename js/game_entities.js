@@ -1,3 +1,7 @@
+
+// TO DO 
+// sprite, x, y, fo future - health, alo - 'empty';
+
 /*
 *
 *
@@ -9,12 +13,13 @@
 
 gd.paused = false;
 gd.gamePaused = 1;
-gd.pause = function(){
+gd.pause = function(main){
 if (gd.paused == true)
   {
     gd.paused = false;
     gd.gamePaused = 1;
     document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
+    //window.requestAnimationFrame(main);
   }
 else
   {
@@ -24,7 +29,161 @@ else
   };
 };
 
+gd.landscape = {}; // object describing not-interactive, static
+// and etc. objects like stones, sands, walls, barriers, fences. etc.
 
+gd.landscape.objects = []// an array of unique stones, walls, barriers, sands, etc.
+gd.landscape.stones = {}; // properties and settings for stones
+gd.landscape.stones.numStones = 0;
+gd.landscape.stones.Enabled = true;
+
+gd.landscape.stones.calcNumStones = function(){
+  var stoneZoneArea = 2;//build 0 to 2 stones max per each 8 
+  var numStoneZones = (gd.numCols*gd.numRows -
+   (gd.numRows*gd.numCols % stoneZoneArea)) / stoneZoneArea;
+  var numStones = 0;
+  var rand = 0;
+  var j = 0;
+  for(var i = 0;i<numStoneZones;i++){
+    rand = gd.getRandomInt(0,9);
+    j = 0;
+    if(rand<3){j = 1;}
+    else if(rand<1){j = 2;}
+    else {j = 0;};
+    numStones = numStones + j;
+  }  
+  return numStones;
+};
+
+gd.landscape.LandscapeObject = function(sprite, type){
+  this.sprite = sprite;
+  this.type = type;
+  var obj1 = {};
+  obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
+  obj1.y = 0;
+  function checkY(obj){
+    obj.y = gd.cellHeight * gd.getRandomInt(0,gd.numRows);
+    if((obj.y>(gd.numRows-2)*gd.cellHeight)||(obj1.y < gd.cellHeight)){
+      obj = checkY(obj);
+      return obj;
+    } else{
+      return obj;
+    };
+  };
+  obj1 = checkY(obj1);
+  function checkCollision(obj){
+    console.log(obj);
+    var collisionCheck = '';
+    collisionCheck = gd.checkCollisions(obj,gd.landscape.objects);
+    console.log(collisionCheck);
+    collisionCheck = collisionCheck.search('collision');
+    if(collisionCheck == -1){
+      console.log('no x collisions');
+      return obj;
+    } else {
+      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
+      obj = checkY(obj);
+      console.log('x collision detected');
+      obj = checkCollision(obj);
+      return obj;
+    };    
+  };
+  obj1 = checkCollision(obj1);
+  
+  // find x, check for collisions, do not put on 
+  // water and to not put on grass
+  this.y = obj1.y;
+  this.x = obj1.x;
+};
+gd.landscape.build = function(sprite){
+  gd.landscape.stones.numStones = gd.landscape.stones.calcNumStones();
+  for(var i = 0;i<gd.landscape.stones.numStones;i++){
+    gd.landscape.objects[i] = new gd.landscape.LandscapeObject('images/Rock.png','stone');
+  };
+};
+
+gd.landscape.LandscapeObject.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y,gd.spriteWidth,gd.spriteHeight);
+
+};
+gd.landscape.renderAll = function(){
+  for(var i = 0;i < gd.landscape.objects.length;i++){
+    gd.landscape.objects[i].render();
+  };
+};
+
+gd.landscape.LandscapeObject.prototype.constructor = gd.landscape.LandscapeObject;
+
+
+gd.checkCollisions = function(obj1,obj2){
+  // return array of descriptive words about
+  // how obj2 relates to obj1;
+  var result = '';
+  var dtX =  0;
+  var dtY = 0;
+  var dtXabs = 0;
+  var dtYabs = 0;
+  var xRelation = 0;
+  var yRelation = 0;
+  var xCloseBy = gd.cellWidth*1.1;
+  var yCloseBy = gd.cellHeight*1.1;
+  var xCollided = gd.cellWidth*0.6;
+  var yCollided = gd.cellHeight*0.6;
+  var i = 0; // var for for statements iterations
+  var j = 0; // var for for statements iterations
+  
+  // if obj1 and obj2 are simple objects
+  if((obj1 instanceof Object)&&(obj2 instanceof Object)){
+    // collided / atleft / atright / atop / below 
+    dtX = obj1.x - obj2.x;
+    dtY = obj1.y - obj2.y;
+    dtXabs = (Math.abs(obj1.x - obj2.x));
+    dtYabs = (Math.abs(obj1.y - obj2.y));
+    
+    if((dtX < 0)&&(dtXabs < xCloseBy)){
+      result = result + ' atright';
+    };
+    if((dtX > 0)&&(dtXabs <  xCloseBy)){
+      result = result + ' atleft';
+    };
+    if((dtY < 0)&&(dtYabs < yCloseBy)){
+      result = result + ' atop';
+    };
+    if((dtY > 0)&&(dtYabs < yCloseBy)){
+      result = result + ' below';
+    };
+    
+    if((dtXabs < xCollided)||(dtYabs < yCollided)){
+      result = result+'collision';
+    };
+    return result;
+  };
+  
+  // if obj1 is an array, and obj2 is an object
+  if((obj1 instanceof Array)&&(obj2 instanceof Object)){
+    for(i=0;i<obj1.length;i++){
+      result = result + gd.checkCollisions(obj1[i],obj2);
+      return result;
+    };
+  };
+  // if obj2 is an object and obj2 is an array
+  if((obj1 instanceof Obj)&&(obj2 instanceof Array)){
+    for(i=0;i<obj2.length;i++){
+      result = result + gd.checkCollisions(obj1,obj2[i]);
+      return result;
+    };
+  };
+  
+  // if obj1 is an array and obj2 is an array
+  if((obj1 instanceof Array)&&(obj2 instanceof Array)){
+    for(i=0;i<obj1.length;i++){
+      result = result + gd.checkCollisions(obj1[i],obj2);
+      return result;
+    };
+  };
+  return result;
+  
+};
 
 
 
@@ -64,14 +223,14 @@ gd.setupGrid = function(){
     gd.windowVertical = false;
     gd.windowHorizontal = true;    
   };
-  // canvas is bound to a div whose width changes from 100% @media 
-  // 992 to 9/12. Calculate canvas's div col width ratio:
-  var canvasCols = 1;
+
+  var maxCanvasWidth = 0; //
   if (gd.windowVertical)
-    {canvasCols = 1;}
-  else{canvasCols = .75;};
-  var maxCanvasWidth = window.innerWidth * canvasCols -30; // -100 for Bootstrap grid padding L+R
-  gd.numCols = (maxCanvasWidth - maxCanvasWidth % gd.cellWidth) / gd.cellWidth - 1;
+    {maxCanvasWidth = window.innerWidth * 1;}
+  else
+    {maxCanvasWidth = window.innerWidth * 0.75;}; // in horizontal canvas takes only 9/12 of the grid;
+  var maxCanvasWidth = maxCanvasWidth -60; // -30 for Bootstrap grid padding L+R
+  gd.numCols = (maxCanvasWidth - maxCanvasWidth % gd.cellWidth) / gd.cellWidth - 2;
   if(gd.windowVertical){
     gd.numRows = (window.innerHeight*0.5 - (window.innerHeight*0.5) % gd.cellHeight)/ gd.cellHeight;
   }
@@ -261,7 +420,7 @@ gd.swarmEnemies = function(){
 // a handleInput() method.
 gd.Player = function(sprite){
   this.sprite = 'images/char-boy.png';
-  this.returnToStart();
+  this.returnToStart(); // defines 
 };
 gd.Player.prototype.constructor = gd.Player;
 
