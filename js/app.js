@@ -1,6 +1,9 @@
 
 gd.player = new gd.Player('images/char-boy.png');
 
+
+
+/*
 var checkCollisions = function(){
   
   gd.allEnemies.forEach(function(enemy){
@@ -12,11 +15,12 @@ var checkCollisions = function(){
         (Math.abs(enemy.y - gd.player.y) < yReach)
       )
       {
-        console.log('collision');
+        // console.log('collision');
         gd.player.dying();
       }
   });
 };
+*/
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify obj.

@@ -117,7 +117,10 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        checkCollisions();
+        if(gd.checkCollisions(gd.allEnemies,gd.player).search('collision') != -1){
+          gd.player.dying();
+        };
+//checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the

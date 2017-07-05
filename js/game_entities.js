@@ -38,7 +38,7 @@ gd.landscape.stones.numStones = 0;
 gd.landscape.stones.Enabled = true;
 
 gd.landscape.stones.calcNumStones = function(){
-  var stoneZoneArea = 2;//build 0 to 2 stones max per each 8 
+  var stoneZoneArea = 4;//build 0 to 2 stones max per each 8 
   var numStoneZones = (gd.numCols*gd.numRows -
    (gd.numRows*gd.numCols % stoneZoneArea)) / stoneZoneArea;
   var numStones = 0;
@@ -59,77 +59,104 @@ gd.landscape.stones.calcNumStones = function(){
 gd.checkCollisions = function(obj1,obj2){
   // return array of descriptive words about
   // how obj2 relates to obj1;
+  // OBJ1 OBJ2 - AT RIGHT
+  
+  // OBJ2 OBJ1 - AT LEFT
+  
+  // OBJ1
+  // OBJ2 - BELOW
+  
+  // OBJ2
+  // OBJ1 - ATOP
+  
   var result = '';
+  if((obj1 == undefined)||(obj2==undefined)){return result};
+  
   var dtX =  0;
   var dtY = 0;
   var dtXabs = 0;
   var dtYabs = 0;
   var xRelation = 0;
   var yRelation = 0;
-  var xCloseBy = gd.cellWidth*1.1;
-  var yCloseBy = gd.cellHeight*1.1;
-  var xCollided = gd.cellWidth*0.6;
-  var yCollided = gd.cellHeight*0.6;
+  var xCloseBy = gd.cellWidth*1.2;
+  var yCloseBy = gd.cellHeight*1.5;
+  var xNeighbour = false;
+  var yNeighbour = false;
+  var xCollided = gd.cellWidth*0.5;
+  var yCollided = gd.cellHeight*0.5;
   var i = 0; // var for for statements iterations
   var j = 0; // var for for statements iterations
-  // if obj1 and obj2 are simple objects
-  if((obj1 instanceof Object)&&(obj2 instanceof Object)&&(!(obj2 instanceof Array))&&(!(obj2 instanceof Array))){
-    // collided / atleft / atright / atop / below 
-    dtX = obj1.x - obj2.x;
-    dtY = obj1.y - obj2.y;
-    dtXabs = (Math.abs(obj1.x - obj2.x));
-    dtYabs = (Math.abs(obj1.y - obj2.y));
-    
-    if((dtX < 0)&&(dtXabs < xCloseBy)){
-      result = result + ' atright';
+  // if obj1 and obj2 are simple objects  
+  if((obj1 instanceof Object)&&(obj2 instanceof Object)&&(!(obj1 instanceof Array))&&(!(obj2 instanceof Array))){
+    // collision / atleft / atright / atop / below 
+
+    if((obj1 == undefined)||(obj2==undefined)){
+      return result;
+    } else {
+      dtX = obj1.x - obj2.x;
+      dtY = obj1.y - obj2.y;
+      dtXabs = (Math.abs(obj1.x - obj2.x));
+      dtYabs = (Math.abs(obj1.y - obj2.y));
+      if((dtX < 0)&&(dtXabs < xCloseBy)&&(dtYabs < yCollided)){
+        result = result + ' atright';
+        // console.log('atright');
+      };
+      if((dtX > 0)&&(dtXabs < xCloseBy)&&(dtYabs < yCollided)){
+        result = result + ' atleft';
+        // console.log('atleft');
+      };
+      if((dtY < 0)&&(dtYabs < yCloseBy)&&(dtXabs < xCollided)){
+        result = result + ' below';
+       // console.log('atop');
+      };
+      if((dtY > 0)&&(dtYabs < yCloseBy)&&(dtXabs < xCollided)){
+        result = result + ' atop';
+        // console.log('below');
+      };
+      
+      if((dtXabs < xCollided)&&(dtYabs < yCollided)){
+        result = result+'collision';
+        console.log('collision');
+      };
+      // console.log('result ',result,', ',dtXabs,', ',dtYabs,' ,',dtX,', ',dtY);
+      return result;
     };
-    if((dtX > 0)&&(dtXabs <  xCloseBy)){
-      result = result + ' atleft';
-    };
-    if((dtY < 0)&&(dtYabs < yCloseBy)){
-      result = result + ' atop';
-    };
-    if((dtY > 0)&&(dtYabs < yCloseBy)){
-      result = result + ' below';
-    };
-    
-    if((dtXabs < xCollided)||(dtYabs < yCollided)){
-      result = result+'collision';
+  };
+ 
+  // if obj1 is an array, and obj2 is an object
+  if((obj1 instanceof Array)&&(obj2 instanceof Object)&&(!(obj2 instanceof Array))){
+  //  console.log('arr and obj');
+    for(i=0;i<obj1.length;i++){
+      result = result + gd.checkCollisions(obj1[i],obj2);
     };
     return result;
   };
-  console.log(obj1 instanceof Array);
-  // if obj1 is an array, and obj2 is an object
-  if((obj1 instanceof Array)&&(obj2 instanceof Object)&&(!(obj2 instanceof Array))){
-    console.log('here');
-    for(i=0;i<obj1.length;i++){
-      result = result + gd.checkCollisions(obj1[i],obj2);
-      return result;
-    };
-  };
   // if obj2 is an object and obj2 is an array
   if((obj1 instanceof Object)&&(!(obj1 instanceof Array))&&(obj2 instanceof Array)){
+//    console.log('obj and arr');
     for(i=0;i<obj2.length;i++){
       result = result + gd.checkCollisions(obj1,obj2[i]);
-      return result;
     };
+    return result;
   };
   
   // if obj1 is an array and obj2 is an array
   if((obj1 instanceof Array)&&(obj2 instanceof Array)){
+  //  console.log('arr and arr');
     for(i=0;i<obj1.length;i++){
       result = result + gd.checkCollisions(obj1[i],obj2);
-      return result;
     };
+    return result;
   };
   return result;
   
 };
 
 // landscape Object superClass constructor
-gd.landscape.LandscapeObject = function(sprite, type){
+gd.landscape.LandscapeObject = function(sprite, type, ID){
   this.sprite = sprite;
   this.type = type;
+  this.ID = ID;
   var obj1 = {};
   obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
   obj1.y = 0;
@@ -145,7 +172,7 @@ gd.landscape.LandscapeObject = function(sprite, type){
   obj1 = checkY(obj1);
   function checkCollision(obj){
     var collisionCheck = '';
-    collisionCheck = gd.checkCollisions(obj,gd.landscape.objects);
+    collisionCheck = gd.checkCollisions(gd.landscape.objects,obj);
     collisionCheck = collisionCheck.search('collision');
     if(collisionCheck == -1){
       return obj;
@@ -165,7 +192,7 @@ gd.landscape.LandscapeObject = function(sprite, type){
 };
 gd.landscape.LandscapeObject.prototype.constructor = gd.landscape.LandscapeObject;
 
-gd.landscape.LandscapeObject.prototype.render = function() {
+gd.landscape.LandscapeObject.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y,gd.spriteWidth,gd.spriteHeight);
 
 };
@@ -173,7 +200,7 @@ gd.landscape.LandscapeObject.prototype.render = function() {
 gd.landscape.build = function(sprite){
   gd.landscape.stones.numStones = gd.landscape.stones.calcNumStones();
   for(var i = 0;i<gd.landscape.stones.numStones;i++){
-    gd.landscape.objects[i] = new gd.landscape.LandscapeObject('images/Rock.png','stone');
+    gd.landscape.objects[i] = new gd.landscape.LandscapeObject('images/Rock.png','stone',i);
   };
 };
 
@@ -346,7 +373,7 @@ gd.Enemy = function(x,y,sprite,nestAddress) {
     // a helper we've provided to easily load images
     this.sprite = sprite;
     this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;
-    this.speed = gd.getRandomInt(40,500);
+    this.speed = gd.getRandomInt(40,200);
     this.y = y;
     this.nestAddress = nestAddress; // address in gd.allEnemies array to referr to
 };
@@ -448,6 +475,52 @@ gd.Player.prototype.render = function(){
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
 
+
+
+gd.Player.prototype.moveLeft = function(){
+  var obstacleAtLeft = false;
+  obstacleAtLeft = !(gd.checkCollisions(gd.landscape.objects,this).search('atright')== -1);
+  if((this.x > 0)&&(!obstacleAtLeft)){
+      this.x = this.x-gd.cellWidth*gd.gamePaused}
+  else {this.cannotDoIt();};
+
+};
+
+gd.Player.prototype.moveRight = function(){
+  var obstacleAtRight = false;
+  obstacleAtRight = !(gd.checkCollisions(gd.landscape.objects,this).search('atleft') == -1);
+  var notBeyondRightBorder = false;
+  notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
+  if(!obstacleAtRight && notBeyondRightBorder){
+    this.x = this.x + gd.cellWidth*gd.gamePaused;
+  } else{
+    this.cannotDoIt();
+  };
+};
+
+gd.Player.prototype.moveUp = function(){
+  var obstacleAtop = false;
+  obstacleAtop = !(gd.checkCollisions(gd.landscape.objects,this).search('below') == -1);
+  if((this.y>0)&&(!obstacleAtop)){
+    this.y = this.y - gd.cellHeight*gd.gamePaused;
+  } else {
+    this.cannotDoIt();
+  };
+};
+
+gd.Player.prototype.moveDown = function(){
+  var notBeyondBottomBorder = false;
+  notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
+  var obstacleBelow = false;
+  obstacleBelow = !(gd.checkCollisions(gd.landscape.objects,this).search('atop') == -1);
+  if(notBeyondBottomBorder&&!obstacleBelow){
+    this.y = this.y + gd.cellHeight*gd.gamePaused;
+  }else{
+    this.cannotDoIt();
+  };
+};
+// <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
+
 gd.Player.prototype.handleInput = function(key){
   
   //if((this.x<0) || (this.y<0) || (this.x > (document.body.canvas.width-this.width)));
@@ -458,37 +531,6 @@ gd.Player.prototype.handleInput = function(key){
     if(key == 'down') this.moveDown();
     
 };
-
-gd.Player.prototype.moveLeft = function(){
-  var obstacleAtLeft = 'd';
-  obstacleAtLeft = gd.checkCollisions(gd.landscape.objects,this);
-  console.log('obstacle',obstacleAtLeft,'eol');
-  
-  if((this.x>0)&&(gd.checkCollisions(this,gd.landscape.objects).search('atleft') == -1))
-    {this.x = this.x-gd.cellWidth*gd.gamePaused}
-  else {this.cannotDoIt();};
-};
-
-gd.Player.prototype.moveRight = function(){
-  if(this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth)){
-    this.x = this.x + gd.cellWidth*gd.gamePaused;
-  };
-};
-
-gd.Player.prototype.moveUp = function(){
-  if(this.y>0){
-    this.y = this.y - gd.cellHeight*gd.gamePaused;
-  };
-};
-
-gd.Player.prototype.moveDown = function(){
-  if(this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5)){
-    this.y = this.y + gd.cellHeight*gd.gamePaused;
-  };
-};
-// <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
-
-
 
 
 
