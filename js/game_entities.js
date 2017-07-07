@@ -6,18 +6,20 @@
 *
 *
 * SYSTEM-LEVEL VARIABLES AND FUNCTIONS
-*
+* Game control, pause, main menu, etc.
 *
 *
 */
 
 gd.paused = false;
 gd.gamePaused = 1;
+gd.movementFrozen = 1; 
 gd.pause = function(main){
 if (gd.paused == true)
   {
     gd.paused = false;
     gd.gamePaused = 1;
+    gd.movementFrozen = 1;
     document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
     //window.requestAnimationFrame(main);
   }
@@ -25,9 +27,56 @@ else
   {
     gd.paused = true;
     gd.gamePaused = 0;
+    gd.movementFrozen = 0;
     document.getElementsByClassName('infoPanel')[0].textContent = "Game is paused.";
   };
 };
+
+/*
+*
+*
+* GAME MENU
+* 
+*
+*
+*/
+
+gd.gameMenuButtonHTML = '<div class="col-xs-%% btn btn-default %class% center-block"><h3>%data%</h3></div>';
+gd.gameMenuContent = [];
+gd.gameMenuContent[0] = {name:'START',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[1] = {name:'BTN1',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[2] = {name:'BTN2',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[3] = {name:'BTN3',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+
+gd.gameMenuBuild = function(){
+  for(var i = 0, width=0;i<gd.gameMenuContent.length;i++){
+    var formattedHTML = '';
+    formattedHTML = gd.gameMenuButtonHTML.replace('%data%',gd.gameMenuContent[i].name);
+    formattedHTML = formattedHTML.replace('%class%',gd.gameMenuContent[i].itemClass);
+    formattedHTML = formattedHTML.replace('col-xs-%%','col-xs-'+gd.gameMenuContent[i].cols);
+    $('.gameMenuModal1 .modal-body').append(formattedHTML);
+    width = width + gd.gameMenuContent[i].cols;
+    if(width > 11){//||((width + gd.gameMenuContent[i+1].cols)>11)){
+      $('.gameMenuModal1 .modal-body').append('<div class="col-xs-12"></div>');
+      width = 0;
+    };
+  }; 
+};
+gd.gameMenuBuild();
+gd.gameMenuModal1 = '<div class="gameMenuModal1"></div>';
+document.getElementsByClassName('btnMenu')[0].onclick = function(){
+        
+        //document.getElementsByClassName('gameMenuModal1')[0].modal('show');
+        if(!gd.paused){
+          gd.pause();
+        } else {
+          
+        };
+        $('.gameMenuModal1').modal('show');
+};
+
+
+
 
 gd.landscape = {}; // object describing not-interactive, static
 // and etc. objects like stones, sands, walls, barriers, fences. etc.
@@ -385,7 +434,7 @@ gd.Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.x = this.x + dt*this.speed;
+    this.x = this.x + dt*this.speed*gd.movementFrozen;
     if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
       // this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;
       // this.speed = gd.getRandomInt(40,500);
@@ -481,7 +530,8 @@ gd.Player.prototype.moveLeft = function(){
   var obstacleAtLeft = false;
   obstacleAtLeft = !(gd.checkCollisions(gd.landscape.objects,this).search('atright')== -1);
   if((this.x > 0)&&(!obstacleAtLeft)){
-      this.x = this.x-gd.cellWidth*gd.gamePaused}
+      this.x = this.x-gd.cellWidth*gd.movementFrozen;
+  }
   else {this.cannotDoIt();};
 
 };
@@ -492,7 +542,7 @@ gd.Player.prototype.moveRight = function(){
   var notBeyondRightBorder = false;
   notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
   if(!obstacleAtRight && notBeyondRightBorder){
-    this.x = this.x + gd.cellWidth*gd.gamePaused;
+    this.x = this.x + gd.cellWidth*gd.movementFrozen;
   } else{
     this.cannotDoIt();
   };
@@ -502,7 +552,7 @@ gd.Player.prototype.moveUp = function(){
   var obstacleAtop = false;
   obstacleAtop = !(gd.checkCollisions(gd.landscape.objects,this).search('below') == -1);
   if((this.y>0)&&(!obstacleAtop)){
-    this.y = this.y - gd.cellHeight*gd.gamePaused;
+    this.y = this.y - gd.cellHeight*gd.movementFrozen;
   } else {
     this.cannotDoIt();
   };
@@ -514,7 +564,7 @@ gd.Player.prototype.moveDown = function(){
   var obstacleBelow = false;
   obstacleBelow = !(gd.checkCollisions(gd.landscape.objects,this).search('atop') == -1);
   if(notBeyondBottomBorder&&!obstacleBelow){
-    this.y = this.y + gd.cellHeight*gd.gamePaused;
+    this.y = this.y + gd.cellHeight*gd.movementFrozen;
   }else{
     this.cannotDoIt();
   };

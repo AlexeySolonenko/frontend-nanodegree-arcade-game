@@ -11,7 +11,8 @@ body {
 .canvasDiv, .controlsDiv, .gameMenuDiv,
 .btnUp, .btnLeft, .btnDn, .btnRight, .btnPause,
 .btnSpacer, .infoPanel, .canvasContainer,
-.canvasStoneField, .screenHoriz, .screenVert
+.canvasStoneField, .screenHoriz, .screenVert,
+.gameMenuModal1, .gameMenuModal1Label, .btnMenu
 {}
 
 
