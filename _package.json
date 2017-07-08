@@ -1,0 +1,50 @@
+{
+  "name": "frontend-nanodegree-arcade-game",
+  "description": "Interactive arcade game. Prototype for future educational game for learning English. Built on inis provided with course work of Udacity Frontend Nanodegree program. Also will serve for credits for the aforementioned course.",
+  "version": "0.1.0",
+  "homepage": "tab4lioz.beget.tech",
+  "author": {
+    "name": "Alexey Solonenko",
+    "email": "ot2@bk.ru",
+    "url": "http://tab4lioz.beget.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexeySolonenko/frontend-nanodegree-arcade-game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexeySolonenko/frontend-nanodegree-arcade-game/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "tab4lioz.beget.tech/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "asdf",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "^0.3.0",
+    "grunt-contrib-jshint": "^0.6.5",
+    "grunt-contrib-nodeunit": "^0.2.2",
+    "grunt-contrib-uglify": "^0.2.7",
+    "grunt-contrib-watch": "^0.4.4",
+    "grunt-responsive-images": "^1.10.1"
+  },
+  "keywords": [],
+  "dependencies": {
+    "glob": "^7.1.2",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^2.2.0",
+    "grunt-contrib-htmlmin": "^2.4.0",
+    "grunt-mkdir": "^1.0.0",
+    "grunt-pagespeed": "^2.0.1"
+  }
+}

@@ -1,7 +1,57 @@
-frontend-nanodegree-arcade-game
-===============================
+# frontend-nanodegree-arcade-game
 
-Students should use this [rubric](https://review.udacity.com/#!/projects/2696458597/rubric) for self-checking their submission. Make sure the functions you write are **object-oriented** - either class functions (like Player and Enemy) or class prototype functions such as Enemy.prototype.checkCollisions, and that the keyword 'this' is used appropriately within your class and class prototype functions to refer to the object the function is called upon. Also be sure that the **readme.md** file is updated with your instructions on both how to 1. Run and 2. Play your arcade game.
+Interactive arcade game. Prototype for future educational game for learning English. Built on inis provided with course work of Udacity Frontend Nanodegree program. Also will serve for credits for the aforementioned course.
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
-test
+## Getting Started
+### On the server
+Install the module with: `npm install frontend-nanodegree-arcade-game`
+
+```javascript
+var frontend_nanodegree_arcade_game = require('frontend-nanodegree-arcade-game');
+frontend_nanodegree_arcade_game.awesome(); // "awesome"
+```
+
+### In the browser
+Download the [production version][min] or the [development version][max].
+
+[min]: https://raw.github.com/AlexeySolonenko/frontend-nanodegree-arcade-game/master/dist/frontend-nanodegree-arcade-game.min.js
+[max]: https://raw.github.com/AlexeySolonenko/frontend-nanodegree-arcade-game/master/dist/frontend-nanodegree-arcade-game.js
+
+In your web page:
+
+```html
+<script src="dist/frontend-nanodegree-arcade-game.min.js"></script>
+<script>
+awesome(); // "awesome"
+</script>
+```
+
+In your code, you can attach frontend-nanodegree-arcade-game's methods to any object.
+
+```html
+<script>
+var exports = Bocoup.utils;
+</script>
+<script src="dist/frontend-nanodegree-arcade-game.min.js"></script>
+<script>
+Bocoup.utils.awesome(); // "awesome"
+</script>
+```
+
+## Documentation
+_(Coming soon)_
+
+## Examples
+_(Coming soon)_
+
+## Contributing
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+
+_Also, please don't edit files in the "dist" subdirectory as they are generated via Grunt. You'll find source code in the "lib" subdirectory!_
+
+## Release History
+_(Nothing yet)_
+
+## License
+Copyright (c) 2017 Alexey Solonenko  
+Licensed under the MIT license.
