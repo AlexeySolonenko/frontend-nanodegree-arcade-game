@@ -13,9 +13,9 @@
 gd.gameMenuButtonHTML = '<div class="col-xs-%% btn btn-default %class% center-block"><h3>%data%</h3></div>';
 gd.gameMenuContent = [];
 gd.gameMenuContent[0] = {name:'START',itemClass:'gameMenuBtnStart',type:'button',cols:6};
-gd.gameMenuContent[1] = {name:'BTN1',itemClass:'gameMenuBtnStart',type:'button',cols:6};
-gd.gameMenuContent[2] = {name:'BTN2',itemClass:'gameMenuBtnStart',type:'button',cols:6};
-gd.gameMenuContent[3] = {name:'BTN3',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[1] = {name:'RULES',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[2] = {name:'ABOUT',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[3] = {name:'INTRO',itemClass:'gameMenuBtnStart',type:'button',cols:6};
 
 gd.gameMenuBuild = function(){
   for(var i = 0, width=0;i<gd.gameMenuContent.length;i++){
@@ -43,4 +43,6 @@ document.getElementsByClassName('btnMenu')[0].onclick = function(){
         };
         $('.gameMenuModal1').modal('show');
 };
+
+gd.health = 50;
 

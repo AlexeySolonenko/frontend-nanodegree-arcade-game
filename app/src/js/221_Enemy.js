@@ -27,7 +27,7 @@ for (var i = 0;i<100;i++){
   gd.allEnemies[i] = 'free';
 };
 // Enemies our player must avoid
-gd.Enemy = function(x,y,sprite,nestAddress) {
+gd.Enemy = function(x,y,sprite,ID) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
@@ -37,7 +37,8 @@ gd.Enemy = function(x,y,sprite,nestAddress) {
     this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;
     this.speed = gd.getRandomInt(40,200);
     this.y = y;
-    this.nestAddress = nestAddress; // address in gd.allEnemies array to referr to
+    this.ID = ID; // address in gd.allEnemies array to referr to
+    this.attacking = false;
 };
 gd.Enemy.prototype.constructor = gd.Enemy;
 
@@ -51,8 +52,11 @@ gd.Enemy.prototype.update = function(dt) {
     if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
       // this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;
       // this.speed = gd.getRandomInt(40,500);
-    gd.allEnemies[this.nestAddress] = 'free';
+    gd.allEnemies[this.ID] = 'free';
+    //this = 'free';
     };
+    
+    
     
     
 };
@@ -70,8 +74,8 @@ gd.Enemy.prototype.render = function() {
 *
 *
 */
-gd.EnemySoldier = function(x,y,sprite,nestAddress){
-  gd.Enemy.call(this,x,y,sprite,nestAddress);
+gd.EnemySoldier = function(x,y,sprite,ID){
+  gd.Enemy.call(this,x,y,sprite,ID);
 }
 gd.EnemySoldier.prototype = Object.create(gd.Enemy.prototype);
 gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
@@ -86,7 +90,7 @@ gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
 */
 
 gd.swarmEnemies = function(){
-  for(var i = 0;i<(gd.numRows-2)*2;i++){
+  for(var i = 0;i<((gd.numRows-2)*2+gd.getRandomInt(0,20));i++){
     var j = i;
     if(j>(gd.numRows-3)) j = 0;
     if(gd.allEnemies[i] == 'free'){  

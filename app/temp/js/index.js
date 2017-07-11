@@ -139,6 +139,16 @@ gd.getRandomInt = function(min,max){
   return Math.floor(Math.random() * (max-min)) + min;
 };
 
+/*
+*
+*
+* CLONE SIMPLE OBJECT
+* IF A TARGET ARGUMENT IS PROVIDED, THEN
+* EXTENDS ARGUMENT WITH OBJ PROPERTIES
+* IF A TARGET ARGUMENT IS NOT PROVIDED, THEN
+* RETURNS A NEW OBJECT
+*/
+
 
 gd.cloneObjSimple = function(obj,target,arrKeys){
   var copy;
@@ -206,6 +216,8 @@ gd.cloneObjSimple = function(obj,target,arrKeys){
 
 
 
+
+
 /*
 *
 *
@@ -218,6 +230,9 @@ gd.cloneObjSimple = function(obj,target,arrKeys){
 gd.paused = false;
 gd.gamePaused = 1;
 gd.movementFrozen = 1; 
+gd.hitsInThisCycle = 0;
+gd.debugKey1 = false;
+
 gd.pause = function(main){
 if (gd.paused == true)
   {
@@ -313,8 +328,9 @@ gd.checkCollisions = function(obj1,obj2){
       };
       
       if((dtXabs < xCollided)&&(dtYabs < yCollided)){
-        result = result+'collision';
-        console.log('collision');
+        if(obj1.ID){result = result+'collisionID'+obj1.ID+';';}
+        else {result = result+'collision';};
+        // console.log('collision');
       };
       // console.log('result ',result,', ',dtXabs,', ',dtYabs,' ,',dtX,', ',dtY);
       return result;
@@ -353,6 +369,13 @@ gd.checkCollisions = function(obj1,obj2){
   
 };
 
+gd.debugKey1Flip = function(){
+  if(gd.debugKey1==true){gd.debugKey1=false}
+  else{gd.debugKey1 = true;};
+};
+
+
+
 
 
 
@@ -376,6 +399,16 @@ gd.numCols = 6;
 gd.windowVertical = false;
 gd.windowHorizontal = false;
 
+
+/*
+*
+*
+* SETUP GRID FUNCTION
+* CALCULATES VARIABLES DEFINING QUANTITAVE PROPERTIES
+* OF CURRENT LAYOUT - WIDTH IN ROWS, HEIGHT, ETC.
+* TAKES CARE OF RESPONSIVE LAYOUT
+*/
+
 gd.setupGrid = function(){
   // find if window is vertical or horizontal
   if(window.innerWidth < window.innerHeight){
@@ -395,10 +428,10 @@ gd.setupGrid = function(){
   var maxCanvasWidth = maxCanvasWidth -60; // -30 for Bootstrap grid padding L+R
   gd.numCols = (maxCanvasWidth - maxCanvasWidth % gd.cellWidth) / gd.cellWidth - 2;
   if(gd.windowVertical){
-    gd.numRows = (window.innerHeight*0.5 - (window.innerHeight*0.5) % gd.cellHeight)/ gd.cellHeight;
+    gd.numRows = (window.innerHeight*0.5 - (window.innerHeight*0.5) % gd.cellHeight-gd.cellHeight)/ gd.cellHeight;
   }
   else if(gd.windowHorizontal){
-    gd.numRows = (window.innerHeight - (window.innerHeight) % gd.cellHeight)/ gd.cellHeight - 1;
+    gd.numRows = (window.innerHeight - (window.innerHeight) % gd.cellHeight - gd.cellHeight)/ gd.cellHeight - 1;
   };
   
 
@@ -454,7 +487,35 @@ gd.setupGrid = function(){
   
     
     
-}
+};
+
+/*
+*
+*
+* UPDATE POSITION OF HTML ELEMENTS 
+* HOVERING ABOVE THE CANVAS: LIVES, LEVEL
+* CHARGES, ETC.
+*
+*/
+
+gd.positionHoverDiv = function(){
+  var divTop = 0;
+  var divLeft = 0;
+  var hoveringHTML = {};
+  var canvasHTML = {};
+//  hoveringHTML = document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0].getBoundingClientRect();
+  hoveringHTML = document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0];  
+  canvasHTML = document.getElementsByClassName('canvasDiv')[0].getBoundingClientRect();
+  divTop = canvasHTML.top;
+  divLeft = canvasHTML.left;
+  hoveringHTML.style.top = divTop+"px"; 
+  // document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0].top = divTop;
+  hoveringHTML.style.left = divLeft+"px";
+};
+
+
+
+
 
 
 
@@ -472,9 +533,9 @@ gd.setupGrid = function(){
 gd.gameMenuButtonHTML = '<div class="col-xs-%% btn btn-default %class% center-block"><h3>%data%</h3></div>';
 gd.gameMenuContent = [];
 gd.gameMenuContent[0] = {name:'START',itemClass:'gameMenuBtnStart',type:'button',cols:6};
-gd.gameMenuContent[1] = {name:'BTN1',itemClass:'gameMenuBtnStart',type:'button',cols:6};
-gd.gameMenuContent[2] = {name:'BTN2',itemClass:'gameMenuBtnStart',type:'button',cols:6};
-gd.gameMenuContent[3] = {name:'BTN3',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[1] = {name:'RULES',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[2] = {name:'ABOUT',itemClass:'gameMenuBtnStart',type:'button',cols:6};
+gd.gameMenuContent[3] = {name:'INTRO',itemClass:'gameMenuBtnStart',type:'button',cols:6};
 
 gd.gameMenuBuild = function(){
   for(var i = 0, width=0;i<gd.gameMenuContent.length;i++){
@@ -502,6 +563,8 @@ document.getElementsByClassName('btnMenu')[0].onclick = function(){
         };
         $('.gameMenuModal1').modal('show');
 };
+
+gd.health = 50;
 
 
 
@@ -637,7 +700,7 @@ for (var i = 0;i<100;i++){
   gd.allEnemies[i] = 'free';
 };
 // Enemies our player must avoid
-gd.Enemy = function(x,y,sprite,nestAddress) {
+gd.Enemy = function(x,y,sprite,ID) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
@@ -647,7 +710,8 @@ gd.Enemy = function(x,y,sprite,nestAddress) {
     this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;
     this.speed = gd.getRandomInt(40,200);
     this.y = y;
-    this.nestAddress = nestAddress; // address in gd.allEnemies array to referr to
+    this.ID = ID; // address in gd.allEnemies array to referr to
+    this.attacking = false;
 };
 gd.Enemy.prototype.constructor = gd.Enemy;
 
@@ -661,8 +725,11 @@ gd.Enemy.prototype.update = function(dt) {
     if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
       // this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;
       // this.speed = gd.getRandomInt(40,500);
-    gd.allEnemies[this.nestAddress] = 'free';
+    gd.allEnemies[this.ID] = 'free';
+    //this = 'free';
     };
+    
+    
     
     
 };
@@ -680,8 +747,8 @@ gd.Enemy.prototype.render = function() {
 *
 *
 */
-gd.EnemySoldier = function(x,y,sprite,nestAddress){
-  gd.Enemy.call(this,x,y,sprite,nestAddress);
+gd.EnemySoldier = function(x,y,sprite,ID){
+  gd.Enemy.call(this,x,y,sprite,ID);
 }
 gd.EnemySoldier.prototype = Object.create(gd.Enemy.prototype);
 gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
@@ -696,7 +763,7 @@ gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
 */
 
 gd.swarmEnemies = function(){
-  for(var i = 0;i<(gd.numRows-2)*2;i++){
+  for(var i = 0;i<((gd.numRows-2)*2+gd.getRandomInt(0,20));i++){
     var j = i;
     if(j>(gd.numRows-3)) j = 0;
     if(gd.allEnemies[i] == 'free'){  
@@ -726,9 +793,11 @@ gd.swarmEnemies = function(){
 gd.Player = function(sprite){
   this.sprite = 'images/char-boy.png';
   this.returnToStart(); // defines 
+  this.name = 'Player Prototype';
+  this.namePosition = {};
+  this.health = 1000;
 };
 gd.Player.prototype.constructor = gd.Player;
-
 gd.Player.prototype.update = function(dt){
   
 };
@@ -740,6 +809,7 @@ gd.Player.prototype.cannotDoIt = function(){
 gd.Player.prototype.returnToStart = function(){
   this.x = gd.cellWidth*2;
   this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
+  this.health = 1000;
 };
 
 gd.Player.prototype.dying = function(){
@@ -797,6 +867,13 @@ gd.Player.prototype.moveDown = function(){
   };
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
+gd.Player.prototype.getAttacked = function(){
+  //console.log('aaaa');
+  this.health = this.health - gd.hitsInThisCycle;
+  gd.hitsInThisCycle = 0;
+  if(this.health < 1)this.dying();
+  
+};
 
 gd.Player.prototype.handleInput = function(key){
   
@@ -810,28 +887,102 @@ gd.Player.prototype.handleInput = function(key){
 };
 
 
+
+ 
+
+gd.updateHoveringItems = function(){
+    // $('.healthScore').remove(".healthScoreSpan");
+    $('.healthScoreSpan').remove();
+    gd.player.namePosition = document.getElementsByClassName('playerName')[0];
+    gd.player.namePosition.textContent = gd.player.name;
+    $('.healthScore').append('<span class="healthScoreSpan">'+gd.player.health+'<\/span>');
+
+};
+
+gd.positionHoveringItems = function(){
+    var namePosition = document.getElementsByClassName('playerName')[0];
+    namePosition.style.left = "200px";
+    namePosition.style.top = gd.cellHeight+"px";
+    
+    var healthScorePosition = document.getElementsByClassName('healthScore')[0];
+    healthScorePosition.style.left = (gd.numCols*gd.cellWidth - gd.cellWidth/2 - healthScorePosition.getBoundingClientRect().width)+"px"; 
+    healthScorePosition.style.top = gd.cellHeight+"px";
+    //gd.player.namePosition = document.getElementsByClassName('playerName')[0];
+    //gd.player.namePosition.style.top = gd.cellHeight+"px";
+    //gd.player.namePosition.style.left = "100px";
+    
+};
+
+
+
+gd.updateAttackers = function(){
+    
+    // FIND WHO IS ATTACKING IN THIS CYCLE/FRAME
+    var collisions = gd.checkCollisions(gd.allEnemies,gd.player);
+    var collisionsArr = [-200];
+    var searchResult = '';
+    var enemyEntry = '';
+    var sliceStart = 0;
+    var sliceEnd = 0;
+    var i = 0;
+    
+    // if(gd.debugKey1){ console.log(collisions.match('collisionID'));};
+    
+    while(i != 1){
+      if(collisions.search('collisionID') != -1){
+        sliceStart = collisions.search('collisionID')+11;
+        sliceEnd = collisions.slice(sliceStart).search(';');
+        searchResult = collisions.slice(sliceStart,sliceStart+sliceEnd);
+        searchResult = Number(searchResult);
+        collisionsArr.push(searchResult);
+        collisions = collisions.slice(sliceStart+sliceEnd);
+      } else {
+        i = 1;
+      };
+    };
+    /* end of while loop */
+    
+    for(i=0;i<gd.allEnemies.length;i++){
+      if(gd.allEnemies[i] != 'free'){
+        
+        // if an enemy was not attacking and is colliding in this
+        // cycle/frame, then tag him 'attacking' and add 1 hit in this cycle
+        if((gd.allEnemies[i].attacking==false)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)!=-1)){
+          
+          gd.allEnemies[i].attacking = true;
+          gd.hitsInThisCycle = gd.hitsInThisCycle + 1;
+          console.log('new attack found: '+gd.hitsInThisCycle);
+        }
+        // if an enemy was attacking in the previous cycle and is still
+        // attacking now and is still colliding, then do nothing
+        else if((gd.allEnemies[i].attacking == true)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)!=-1)){
+          console.log('still attacking, no change'+gd.allEnemies[i].ID);
+        }
+        // if an enemy was colliding and attacking in the previous 
+        // cycle but not colliding now, and, consequently, is not 
+        // colliding anymore, then reset its attacking state
+        else if((gd.allEnemies[i].attacking==true)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)==-1)){
+          console.log(gd.allEnemies[i].ID+'resets');
+          gd.allEnemies[i].attacking = false;
+        };
+      };
+      
+    }; 
+    
+      // searchResult = collisions.search('collision');
+      // semicolon = collisions.slice(searchResult).search(';');
+      // enemyEntry = collisions.slice(searchResult+9,semicolon);
+      // console.log(enemyEntry); 
+      // searchResult = -1;
+    
+};
+
+
 gd.player = new gd.Player('images/char-boy.png');
 
 
 
-/*
-var checkCollisions = function(){
-  
-  gd.allEnemies.forEach(function(enemy){
 
-    var xReach = gd.cellWidth * 0.6;
-    var yReach = gd.cellHeight * 0.6;
-    if(
-        (Math.abs(enemy.x - gd.player.x) < xReach)&&
-        (Math.abs(enemy.y - gd.player.y) < yReach)
-      )
-      {
-        // console.log('collision');
-        gd.player.dying();
-      }
-  });
-};
-*/
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify obj.
@@ -973,6 +1124,7 @@ var Engine = (function(global) {
         gd.player.returnToStart();
         gd.landscape.build();
         document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
+            
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -986,11 +1138,15 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        if(gd.checkCollisions(gd.allEnemies,gd.player).search('collision') != -1){
-          gd.player.dying();
-        };
+        gd.updateAttackers();
+        gd.player.getAttacked();
+
+        //if(collisions.search('collision') != -1){
+          // console.log('shit!');
+          // gd.player.dying();
+        //};
 //checkCollisions();
-    }
+    };
 
     /* This is called by the update function and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
@@ -1021,6 +1177,9 @@ var Engine = (function(global) {
          */
        // var experimentImg = gd.draw(ctx);
        gd.setupGrid();
+       gd.positionHoverDiv();
+       gd.updateHoveringItems();
+       gd.positionHoveringItems();
        
        canvas.width = gd.numCols*gd.cellWidth;
        canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
@@ -1059,6 +1218,8 @@ var Engine = (function(global) {
         // gd.landscape.stonny.render();
         gd.landscape.renderAll();
         renderEntities();
+        document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').left = ctx.x;
+        document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').top = document.getElementsByTagName("CANVAS")[0].y;
     }
 
     /* This function is called by the render function and is called on each game

@@ -105,6 +105,7 @@ var Engine = (function(global) {
         gd.player.returnToStart();
         gd.landscape.build();
         document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
+            
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -118,11 +119,15 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        if(gd.checkCollisions(gd.allEnemies,gd.player).search('collision') != -1){
-          gd.player.dying();
-        };
+        gd.updateAttackers();
+        gd.player.getAttacked();
+
+        //if(collisions.search('collision') != -1){
+          // console.log('shit!');
+          // gd.player.dying();
+        //};
 //checkCollisions();
-    }
+    };
 
     /* This is called by the update function and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
@@ -153,6 +158,9 @@ var Engine = (function(global) {
          */
        // var experimentImg = gd.draw(ctx);
        gd.setupGrid();
+       gd.positionHoverDiv();
+       gd.updateHoveringItems();
+       gd.positionHoveringItems();
        
        canvas.width = gd.numCols*gd.cellWidth;
        canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
@@ -191,6 +199,8 @@ var Engine = (function(global) {
         // gd.landscape.stonny.render();
         gd.landscape.renderAll();
         renderEntities();
+        document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').left = ctx.x;
+        document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').top = document.getElementsByTagName("CANVAS")[0].y;
     }
 
     /* This function is called by the render function and is called on each game

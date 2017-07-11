@@ -16,6 +16,15 @@
     <link rel="stylesheet" href="css/bootstrap-theme.min.css"> -->
 </head>
 <body>
+
+  <div class="aboveCanvasHoveringHTMLDiv userTest" style="position:relative;">
+  <!--
+          <div class=" userTest" style="position:absolute; left:300px; top:100px; z-index:500; background-color:red;">test</div>
+          --> 
+          <div class="healthScore">HEALTH:</div>
+          <div class="playerName"><h3>%data%</h3></div>
+  </div>
+
   <div class="container-fluid">
     <div class = "row">
       <h3 class="infoPanel panel panel-default"></h3>
@@ -37,8 +46,9 @@
       
       <!--Append game canvas here. Game canvas dims are calculated automatically. see js. -->
       
-      <div class="canvasDiv userTest" >
-      
+      <div class="canvasDiv userTest">
+
+        
       </div><!-- main game canvas div -->
     
       <!-- Controls div. Put arrows and other extra buttons, if any, here -->
@@ -63,32 +73,36 @@
       </div><!-- Controls div. -->
     </div><!-- Whole game div -->
     
-  <div class="modal fade gameMenuModal1" tabindex="-1" role="dialog" aria-labelledby="gameMenuModal1Label" >
 
-    <div class="modal-dialog" role="document">
-      <div class="modal-content ">
-        <div class="modal-header">
-          <button type="button" class=" user-modal-intro-button1 close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <div><h4 class="modal-title user-modal-intro-label center-block">GAME MENU</h4></div>
-        </div>
-        <div class="modal-body row">
-          <div class="userTest col-xs-3">
-            test
+    
+    <div class="modal fade gameMenuModal1" tabindex="-1" role="dialog" aria-labelledby="gameMenuModal1Label" >
+
+      <div class="modal-dialog" role="document">
+        <div class="modal-content ">
+          <div class="modal-header">
+            <button type="button" class=" user-modal-intro-button1 close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div><h4 class="modal-title user-modal-intro-label center-block">GAME MENU</h4></div>
           </div>
-          <div class="userTest col-xs-3">
-            test
-            test
+          <div class="modal-body row">
+            <div class="userTest col-xs-3">
+              test
+            </div>
+            <div class="userTest col-xs-3">
+              test
+              test
+            </div>
+            <div class="userTest col-xs-3">
+              test
+            </div>
           </div>
-          <div class="userTest col-xs-3">
-            test
+          <div class="modal-footer">
+            <button type="button" class="btn user-modal-intro-button1 btn-default" data-dismiss="modal">Close</button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn user-modal-intro-button1 btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div>  <!-- END OF INTRO MODAL -->
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>  <!-- END OF INTRO MODAL -->
+
+
 
 
   </div><!-- main bootstrap container-fluid -->

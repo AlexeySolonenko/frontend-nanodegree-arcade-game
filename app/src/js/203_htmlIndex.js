@@ -20,6 +20,16 @@ gd.numCols = 6;
 gd.windowVertical = false;
 gd.windowHorizontal = false;
 
+
+/*
+*
+*
+* SETUP GRID FUNCTION
+* CALCULATES VARIABLES DEFINING QUANTITAVE PROPERTIES
+* OF CURRENT LAYOUT - WIDTH IN ROWS, HEIGHT, ETC.
+* TAKES CARE OF RESPONSIVE LAYOUT
+*/
+
 gd.setupGrid = function(){
   // find if window is vertical or horizontal
   if(window.innerWidth < window.innerHeight){
@@ -39,10 +49,10 @@ gd.setupGrid = function(){
   var maxCanvasWidth = maxCanvasWidth -60; // -30 for Bootstrap grid padding L+R
   gd.numCols = (maxCanvasWidth - maxCanvasWidth % gd.cellWidth) / gd.cellWidth - 2;
   if(gd.windowVertical){
-    gd.numRows = (window.innerHeight*0.5 - (window.innerHeight*0.5) % gd.cellHeight)/ gd.cellHeight;
+    gd.numRows = (window.innerHeight*0.5 - (window.innerHeight*0.5) % gd.cellHeight-gd.cellHeight)/ gd.cellHeight;
   }
   else if(gd.windowHorizontal){
-    gd.numRows = (window.innerHeight - (window.innerHeight) % gd.cellHeight)/ gd.cellHeight - 1;
+    gd.numRows = (window.innerHeight - (window.innerHeight) % gd.cellHeight - gd.cellHeight)/ gd.cellHeight - 1;
   };
   
 
@@ -98,5 +108,33 @@ gd.setupGrid = function(){
   
     
     
-}
+};
+
+/*
+*
+*
+* UPDATE POSITION OF HTML ELEMENTS 
+* HOVERING ABOVE THE CANVAS: LIVES, LEVEL
+* CHARGES, ETC.
+*
+*/
+
+gd.positionHoverDiv = function(){
+  var divTop = 0;
+  var divLeft = 0;
+  var hoveringHTML = {};
+  var canvasHTML = {};
+//  hoveringHTML = document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0].getBoundingClientRect();
+  hoveringHTML = document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0];  
+  canvasHTML = document.getElementsByClassName('canvasDiv')[0].getBoundingClientRect();
+  divTop = canvasHTML.top;
+  divLeft = canvasHTML.left;
+  hoveringHTML.style.top = divTop+"px"; 
+  // document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0].top = divTop;
+  hoveringHTML.style.left = divLeft+"px";
+};
+
+
+
+
 

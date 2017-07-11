@@ -6,6 +6,16 @@ gd.getRandomInt = function(min,max){
   return Math.floor(Math.random() * (max-min)) + min;
 };
 
+/*
+*
+*
+* CLONE SIMPLE OBJECT
+* IF A TARGET ARGUMENT IS PROVIDED, THEN
+* EXTENDS ARGUMENT WITH OBJ PROPERTIES
+* IF A TARGET ARGUMENT IS NOT PROVIDED, THEN
+* RETURNS A NEW OBJECT
+*/
+
 
 gd.cloneObjSimple = function(obj,target,arrKeys){
   var copy;
@@ -41,6 +51,8 @@ gd.cloneObjSimple = function(obj,target,arrKeys){
   
   // throw new Error("Unable to define the type of the argument. Copy has not been done.")
 };
+
+
 
 
 

@@ -6,13 +6,38 @@ body {
 
 .userTest{
   border: 1px solid black;
+  
+}
+
+.healthScore{
+  background-color:red;
+  position:absolute;
+  z-index:502; 
+}
+
+.playerName{
+  position:absolute;
+  color: #D0F8FF;
+  /*
+  text-shadow: 0 0 5px #A5F1FF, 0 0 10px #A5F1FF,
+             0 0 20px #A5F1FF, 0 0 30px #A5F1FF,
+             0 0 40px #A5F1FF;
+             */
+ 
+    text-shadow: 0 1px 0 #999999, 0 2px 0 #888888,
+             0 3px 0 #777777, 0 4px 0 #666666,
+             0 5px 0 #555555, 0 6px 0 #444444,
+             0 7px 0 #333333, 0 8px 7px rgba(0, 0, 0, 0.4),
+             0 9px 10px rgba(0, 0, 0, 0.2);
+  z-index : 503;
 }
 
 .canvasDiv, .controlsDiv, .gameMenuDiv,
 .btnUp, .btnLeft, .btnDn, .btnRight, .btnPause,
 .btnSpacer, .infoPanel, .canvasContainer,
 .canvasStoneField, .screenHoriz, .screenVert,
-.gameMenuModal1, .gameMenuModal1Label, .btnMenu
+.gameMenuModal1, .gameMenuModal1Label, .btnMenu,
+.aboveCanvasHoveringHTMLDiv, .userTest2, .healthScoreSpan
 {}
 
 

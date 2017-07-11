@@ -12,6 +12,9 @@
 gd.paused = false;
 gd.gamePaused = 1;
 gd.movementFrozen = 1; 
+gd.hitsInThisCycle = 0;
+gd.debugKey1 = false;
+
 gd.pause = function(main){
 if (gd.paused == true)
   {
@@ -107,8 +110,9 @@ gd.checkCollisions = function(obj1,obj2){
       };
       
       if((dtXabs < xCollided)&&(dtYabs < yCollided)){
-        result = result+'collision';
-        console.log('collision');
+        if(obj1.ID){result = result+'collisionID'+obj1.ID+';';}
+        else {result = result+'collision';};
+        // console.log('collision');
       };
       // console.log('result ',result,', ',dtXabs,', ',dtYabs,' ,',dtX,', ',dtY);
       return result;
@@ -146,4 +150,11 @@ gd.checkCollisions = function(obj1,obj2){
   return result;
   
 };
+
+gd.debugKey1Flip = function(){
+  if(gd.debugKey1==true){gd.debugKey1=false}
+  else{gd.debugKey1 = true;};
+};
+
+
 

@@ -19,9 +19,11 @@
 gd.Player = function(sprite){
   this.sprite = 'images/char-boy.png';
   this.returnToStart(); // defines 
+  this.name = 'Player Prototype';
+  this.namePosition = {};
+  this.health = 1000;
 };
 gd.Player.prototype.constructor = gd.Player;
-
 gd.Player.prototype.update = function(dt){
   
 };
@@ -33,6 +35,7 @@ gd.Player.prototype.cannotDoIt = function(){
 gd.Player.prototype.returnToStart = function(){
   this.x = gd.cellWidth*2;
   this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
+  this.health = 1000;
 };
 
 gd.Player.prototype.dying = function(){
@@ -90,6 +93,13 @@ gd.Player.prototype.moveDown = function(){
   };
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
+gd.Player.prototype.getAttacked = function(){
+  //console.log('aaaa');
+  this.health = this.health - gd.hitsInThisCycle;
+  gd.hitsInThisCycle = 0;
+  if(this.health < 1)this.dying();
+  
+};
 
 gd.Player.prototype.handleInput = function(key){
   
