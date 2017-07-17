@@ -109,5 +109,6 @@ gd.Player.prototype.handleInput = function(key){
     if(key == 'up') this.moveUp();
     if(key == 'right') this.moveRight();
     if(key == 'down') this.moveDown();
+    if((key == 'q')||(key == 'Q')) gd.debugKey1Flip();
     
 };

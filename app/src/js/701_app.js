@@ -14,7 +14,9 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down',
         80: 'P',
-        112: 'p'
+        112: 'p',
+        81 : 'q',
+        113 : 'Q',
     };
 
     gd.player.handleInput(allowedKeys[e.keyCode],gd.player);
@@ -35,5 +37,6 @@ document.getElementsByClassName('btnRight')[0].onclick = function(){
 document.getElementsByClassName('btnPause')[0].onclick = function(){
   gd.pause();
 };
+
 
 

@@ -36,18 +36,18 @@ gd.updateAttackers = function(){
           
           gd.allEnemies[i].attacking = true;
           gd.hitsInThisCycle = gd.hitsInThisCycle + 1;
-          console.log('new attack found: '+gd.hitsInThisCycle);
+          // console.log('new attack found: '+gd.hitsInThisCycle);
         }
         // if an enemy was attacking in the previous cycle and is still
         // attacking now and is still colliding, then do nothing
         else if((gd.allEnemies[i].attacking == true)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)!=-1)){
-          console.log('still attacking, no change'+gd.allEnemies[i].ID);
+          // console.log('still attacking, no change'+gd.allEnemies[i].ID);
         }
         // if an enemy was colliding and attacking in the previous 
         // cycle but not colliding now, and, consequently, is not 
         // colliding anymore, then reset its attacking state
         else if((gd.allEnemies[i].attacking==true)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)==-1)){
-          console.log(gd.allEnemies[i].ID+'resets');
+          // console.log(gd.allEnemies[i].ID+'resets');
           gd.allEnemies[i].attacking = false;
         };
       };

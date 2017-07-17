@@ -151,6 +151,7 @@ gd.checkCollisions = function(obj1,obj2){
   
 };
 
+
 gd.debugKey1Flip = function(){
   if(gd.debugKey1==true){gd.debugKey1=false}
   else{gd.debugKey1 = true;};
