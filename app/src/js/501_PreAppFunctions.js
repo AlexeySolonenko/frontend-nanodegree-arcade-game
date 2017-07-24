@@ -3,7 +3,7 @@
 gd.updateAttackers = function(){
     
     // FIND WHO IS ATTACKING IN THIS CYCLE/FRAME
-    var collisions = gd.checkCollisions(gd.allEnemies,gd.player);
+    var collisions = gd.checkCollisions(gd.allGameObjects,gd.allGameObjects[0]); //gd.allGameObjects[0] to [9] - players
     var collisionsArr = [-200];
     var searchResult = '';
     var enemyEntry = '';
@@ -27,28 +27,28 @@ gd.updateAttackers = function(){
     };
     /* end of while loop */
     
-    for(i=0;i<gd.allEnemies.length;i++){
-      if(gd.allEnemies[i] != 'free'){
+    for(i=0;i<gd.allGameObjects.length;i++){
+      if((gd.allGameObjects[i] != 'free')&&(gd.allGameObjects[i].type=='enemy')){
         
         // if an enemy was not attacking and is colliding in this
         // cycle/frame, then tag him 'attacking' and add 1 hit in this cycle
-        if((gd.allEnemies[i].attacking==false)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)!=-1)){
+        if((gd.allGameObjects[i].attacking==false)&&(collisionsArr.indexOf(gd.allGameObjects[i].ID)!=-1)){
           
-          gd.allEnemies[i].attacking = true;
+          gd.allGameObjects[i].attacking = true;
           gd.hitsInThisCycle = gd.hitsInThisCycle + 1;
           // console.log('new attack found: '+gd.hitsInThisCycle);
         }
         // if an enemy was attacking in the previous cycle and is still
         // attacking now and is still colliding, then do nothing
-        else if((gd.allEnemies[i].attacking == true)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)!=-1)){
-          // console.log('still attacking, no change'+gd.allEnemies[i].ID);
+        else if((gd.allGameObjects[i].attacking == true)&&(collisionsArr.indexOf(gd.allGameObjects[i].ID)!=-1)){
+          // console.log('still attacking, no change'+gd.allGameObjects[i].ID);
         }
         // if an enemy was colliding and attacking in the previous 
         // cycle but not colliding now, and, consequently, is not 
         // colliding anymore, then reset its attacking state
-        else if((gd.allEnemies[i].attacking==true)&&(collisionsArr.indexOf(gd.allEnemies[i].ID)==-1)){
-          // console.log(gd.allEnemies[i].ID+'resets');
-          gd.allEnemies[i].attacking = false;
+        else if((gd.allGameObjects[i].attacking==true)&&(collisionsArr.indexOf(gd.allGameObjects[i].ID)==-1)){
+          // console.log(gd.allGameObjects[i].ID+'resets');
+          gd.allGameObjects[i].attacking = false;
         };
       };
       

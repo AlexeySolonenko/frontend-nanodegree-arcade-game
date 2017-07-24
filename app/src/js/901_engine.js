@@ -32,13 +32,13 @@ var Engine = (function(global) {
     canvas.width = gd.numCols*gd.cellWidth;
     canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
     doc.getElementsByClassName("canvasDiv")[0].appendChild(canvas);
-    
+   
     // gd.landscape.stonny = new gd.landscape.LandscapeObject('images/Rock.png','stone');
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
-     
+    /* 
     function loopPause(){
       if(gd.paused){
         loopPause();
@@ -47,16 +47,15 @@ var Engine = (function(global) {
        win.requestAnimationFrame(main);
       };
     };
-    
+    */
     function main() {
         /* Get our time delta information which is required if your game
          * requires smooth animation. Because everyone's computer processes
          * instructions at different speeds we need a constant value that
          * would be the same for everyone (regardless of how fast their
          * computer is) - hurray time!
-         */
-        var now = Date.now(),
-            dt = (now - lastTime) / 1000.0;
+         */      
+        var now = Date.now(), dt = (now - lastTime) / 1000.0;
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
@@ -73,26 +72,9 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-         
 
-        
-       // console.log(fps);
        win.requestAnimationFrame(main);
-       
-       /*if(!gd.paused){
-        win.requestAnimationFrame(main);
-       }
-       else{
-        console.log('Animation is paused');
-        loopPause();
-       };
-       */
-        /*
-        setTimeout(function(){
-          win.requestAnimationFrame(main); // a method with a call back;
-        }, timeout);
-        */
-    }
+    }; // main()
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -102,7 +84,7 @@ var Engine = (function(global) {
         reset();
         lastTime = Date.now();
         main();
-        gd.player.returnToStart();
+        gd.allGameObjects[0].returnToStart();
         gd.landscape.build();
         document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
             
@@ -118,15 +100,12 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
+       
         updateEntities(dt);
-        gd.updateAttackers();
-        gd.player.getAttacked();
-
-        //if(collisions.search('collision') != -1){
-          // console.log('shit!');
-          // gd.player.dying();
-        //};
-//checkCollisions();
+        // gd.updateAttackers();
+        
+        // gd.allGameObjects[0].getAttacked();
+ 
     };
 
     /* This is called by the update function and loops through all of the
@@ -137,14 +116,40 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        gd.allEnemies.forEach(function(enemy) {
-          if(enemy != 'free'){
+        /* gd.allGameObjects.forEach(function(enemy) {
+          if((enemy != 'free')&&(enemy.type=='enemy')){
             enemy.update(dt);
           }
         });
-        gd.player.update(dt);
-       
-    }
+        */
+        gd.swarmEnemies();
+        /*
+        for(var i = 0;i<gd.allGameObjects.length;i++){
+          if(gd.allGameObjects[i].type == 'enemy'){
+            gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects); 
+          };
+        };
+        */
+        for(var i = 0;i<gd.allGameObjects.length;i++){
+          if(gd.allGameObjects[i] != 'free'){
+            gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects); 
+          };
+        };
+        for(var i = 0;i<gd.allGameObjects.length;i++){
+          if(gd.allGameObjects[i].type == 'enemy'){
+            gd.allGameObjects[i].defineDirection();
+            gd.allGameObjects[i].update(dt);  
+          };
+        };
+        for(var i = 0;i<gd.allGameObjects.length;i++){
+          if(gd.allGameObjects[i].type == 'enemy'){
+            // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
+            gd.allGameObjects[i].eraser();  
+          };
+        };
+        gd.allGameObjects[0].update(dt);
+        
+    };
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -158,6 +163,7 @@ var Engine = (function(global) {
          */
        // var experimentImg = gd.draw(ctx);
        gd.setupGrid();
+       
        gd.positionHoverDiv();
        gd.updateHoveringItems();
        gd.positionHoveringItems();
@@ -199,6 +205,9 @@ var Engine = (function(global) {
         // gd.landscape.stonny.render();
         gd.landscape.renderAll();
         renderEntities();
+        //for(var i = 0;i<gd.allGameObjects.length;i++){
+        //  gd.resetPosRelations(gd.allGameObjects[i]);
+        //};
         document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').left = ctx.x;
         document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').top = document.getElementsByTagName("CANVAS")[0].y;
     }
@@ -211,15 +220,24 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        gd.swarmEnemies();
-
-        gd.allEnemies.forEach(function(enemy) {
-            if(enemy != 'free'){
+          
+       //gd.swarmEnemies();
+      
+       
+      for(var i=0;i<gd.allGameObjects.length;i++){
+        if(gd.allGameObjects[i].type=='enemy'){
+          gd.allGameObjects[i].render(); 
+        };
+      };
+            /*
+        gd.allGameObjects.forEach(function(enemy) {
+            if((enemy != 'free')&&(enemy.type=='enemy')){
               enemy.render();
             };
         });
-
-        gd.player.render();
+        */
+        gd.allGameObjects[0].render();
+          //gd.swarmEnemies();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -250,4 +268,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    gd.swarmEnemies();  
 })(this);

@@ -14,7 +14,6 @@
 gd.landscape = {}; // object describing not-interactive, static
 // and etc. objects like stones, sands, walls, barriers, fences. etc.
 
-gd.landscape.objects = [];// an array of unique stones, walls, barriers, sands, etc.
 gd.landscape.stones = {}; // properties and settings for stones
 gd.landscape.stones.numStones = 0;
 gd.landscape.stones.Enabled = true;
@@ -41,15 +40,25 @@ gd.landscape.stones.calcNumStones = function(){
 
 
 // landscape Object superClass constructor
-gd.landscape.LandscapeObject = function(sprite, type, ID){
+gd.landscape.LandscapeObject = function(sprite, type, kind, ID){
   this.sprite = sprite;
   this.type = type;
+  this.kind = kind;
+  this.leftNeighbour = 'free';
+  this.rightNeighbour = 'free';
+  this.belowNeighbour = 'free';
+  this.topNeighbour = 'free';
+  this.leftNeighbourArr = [];
+  this.rightNeighbourArr = [];
+  this.topNeighbourArr = [];
+  this.belowNeighbourArr = [];
+  this.collidees = [];
   this.ID = ID;
   var obj1 = {};
-  obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
+  obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols-2)+2*gd.cellWidth;
   obj1.y = 0;
   function checkY(obj){
-    obj.y = gd.cellHeight * gd.getRandomInt(0,gd.numRows);
+    obj.y = gd.cellHeight * gd.getRandomInt(0,gd.numRows)+gd.cellHeight*0.25;
     if((obj.y>(gd.numRows-3)*gd.cellHeight)||(obj1.y < gd.cellHeight)){
       obj = checkY(obj);
       return obj;
@@ -58,18 +67,28 @@ gd.landscape.LandscapeObject = function(sprite, type, ID){
     };
   };
   obj1 = checkY(obj1);
+  obj1.collidees = [];
+  obj1.leftNeighbourArr = [];
+  obj1.rightNeighbourArr = [];
+  obj1.topNeighbourArr = [];
+  obj1.belowNeighbourArr = [];
+  
   function checkCollision(obj){
-    var collisionCheck = '';
-    collisionCheck = gd.checkCollisions(gd.landscape.objects,obj);
-    collisionCheck = collisionCheck.search('collision');
-    if(collisionCheck == -1){
-      return obj;
-    } else {
-      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols);
-      obj = checkY(obj);
+    for(var i = 0;i<gd.allGameObjects.length;i++){
+      if(gd.allGameObjects[i]!='free'){
+        if(gd.allGameObjects[i].kind=='stone'){
+          gd.checkCollisions(obj,gd.allGameObjects[i]);
+        }
+      };
+    };
+    if(obj.collidees.length>0){
+      obj.collidees = [];
+      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols-1)+gd.cellWidth;
       obj = checkCollision(obj);
       return obj;
-    };    
+    } else{
+      return obj;
+    };
   };
   obj1 = checkCollision(obj1);
   
@@ -85,17 +104,23 @@ gd.landscape.LandscapeObject.prototype.render = function(){
 
 };
 
+gd.landscape.LandscapeObject.prototype.move = function(){
+  
+};
+
 gd.landscape.build = function(sprite){
   gd.landscape.stones.numStones = gd.landscape.stones.calcNumStones();
-  for(var i = 0;i<gd.landscape.stones.numStones;i++){
-    gd.landscape.objects[i] = new gd.landscape.LandscapeObject('images/Rock.png','stone',i);
+  for(var i = 101;i<gd.landscape.stones.numStones+101;i++){
+    gd.allGameObjects[i] = new gd.landscape.LandscapeObject('images/Rock.png','blocked','stone',i);
   };
 };
 
 
 gd.landscape.renderAll = function(){
-  for(var i = 0;i < gd.landscape.objects.length;i++){
-    gd.landscape.objects[i].render();
+  for(var i = 0;i < gd.allGameObjects.length;i++){
+    if((gd.allGameObjects[i].type=='blocked') && (gd.allGameObjects[i].kind=='stone')){
+      gd.allGameObjects[i].render();
+    };
   };
 };
 

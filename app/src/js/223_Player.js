@@ -16,17 +16,27 @@
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
-gd.Player = function(sprite){
+gd.Player = function(sprite,ID){
   this.sprite = 'images/char-boy.png';
   this.returnToStart(); // defines 
   this.name = 'Player Prototype';
   this.namePosition = {};
   this.health = 1000;
+  this.leftNeighbour = 'free'; // can be   bro || blocked ||  free
+  this.rightNeighbour = 'free';
+  this.topNeighbour = 'free';
+  this.belowNeighbour = 'free';
+  this.type = 'player';
+  gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
+gd.Player.prototype = Object.create(gd.MovingObject.prototype);
 gd.Player.prototype.constructor = gd.Player;
+
 gd.Player.prototype.update = function(dt){
   
 };
+
+  
 gd.Player.prototype.speed = 1;
 gd.Player.prototype.cannotDoIt = function(){
   
@@ -94,7 +104,7 @@ gd.Player.prototype.moveDown = function(){
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
 gd.Player.prototype.getAttacked = function(){
-  //console.log('aaaa');
+ 
   this.health = this.health - gd.hitsInThisCycle;
   gd.hitsInThisCycle = 0;
   if(this.health < 1)this.dying();
@@ -112,3 +122,5 @@ gd.Player.prototype.handleInput = function(key){
     if((key == 'q')||(key == 'Q')) gd.debugKey1Flip();
     
 };
+
+gd.allGameObjects[0] = new gd.Player('images/char-boy.png',0);

@@ -5,9 +5,9 @@
 gd.updateHoveringItems = function(){
     // $('.healthScore').remove(".healthScoreSpan");
     $('.healthScoreSpan').remove();
-    gd.player.namePosition = document.getElementsByClassName('playerName')[0];
-    gd.player.namePosition.textContent = gd.player.name;
-    $('.healthScore').append('<span class="healthScoreSpan">'+gd.player.health+'<\/span>');
+    gd.allGameObjects[0].namePosition = document.getElementsByClassName('playerName')[0];
+    gd.allGameObjects[0].namePosition.textContent = gd.allGameObjects[0].name;
+    $('.healthScore').append('<span class="healthScoreSpan">'+gd.allGameObjects[0].health+'<\/span>');
 
 };
 

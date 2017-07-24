@@ -1,6 +1,4 @@
 
-gd.player = new gd.Player('images/char-boy.png');
-
 
 
 
@@ -19,20 +17,20 @@ document.addEventListener('keyup', function(e) {
         113 : 'Q',
     };
 
-    gd.player.handleInput(allowedKeys[e.keyCode],gd.player);
+    gd.allGameObjects[0].handleInput(allowedKeys[e.keyCode],gd.allGameObjects[0]);
 });
 
 document.getElementsByClassName('btnUp')[0].onclick = function(){
-  gd.player.moveUp();
+  gd.allGameObjects[0].moveUp();
 };
 document.getElementsByClassName('btnLeft')[0].onclick = function(){
-  gd.player.moveLeft();
+  gd.allGameObjects[0].moveLeft();
 };
 document.getElementsByClassName('btnDn')[0].onclick = function(){
-  gd.player.moveDown();;
+  gd.allGameObjects[0].moveDown();;
 };
 document.getElementsByClassName('btnRight')[0].onclick = function(){
-  gd.player.moveRight();
+  gd.allGameObjects[0].moveRight();
 };
 document.getElementsByClassName('btnPause')[0].onclick = function(){
   gd.pause();
