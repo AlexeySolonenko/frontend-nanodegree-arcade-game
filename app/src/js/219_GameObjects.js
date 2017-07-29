@@ -37,9 +37,25 @@ gd.MovingObject.prototype.test = function(){
 };
 gd.MovingObject.prototype.move = function(dt){  
  
+  var incr = 0;
+  incr = gd.movementFrozen*(dt*this.speed-(dt*this.speed)%1); 
+
+  if(this.direction == 'right'){this.x = this.x + incr;};
+  if(this.direction == 'left'){this.x = this.x - incr;};
+  if(this.direction == 'down'){this.y = this.y + incr;};
+  if(this.direction == 'up'){this.y = this.y - incr;};  
+  if(this.direction == 'stay'){this.x = this.x; this.y = this.y;};
+ 
+  /*
   if(this.direction == 'right'){this.x = this.x + dt*this.speed*gd.movementFrozen;};
   if(this.direction == 'left'){this.x = this.x - dt*this.speed*gd.movementFrozen;};
   if(this.direction == 'down'){this.y = this.y + dt*this.speed*gd.movementFrozen;};
   if(this.direction == 'up'){this.y = this.y - dt*this.speed*gd.movementFrozen;};  
   if(this.direction == 'stay'){this.x = this.x; this.y = this.y;};
+  */
 };
+
+
+
+
+

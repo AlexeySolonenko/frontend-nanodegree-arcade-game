@@ -27,7 +27,7 @@
 gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.sprite = sprite;
   this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;  
-  this.speed = gd.getRandomInt(40,200);
+  this.speed = gd.getRandomInt(100,200);
   this.y = y;
   this.ID = ID; // address in gd.allGameObjects array to referr to
   this.attacking = false;
@@ -154,10 +154,23 @@ gd.EnemySoldier = function(x,y,sprite,ID,direction,type){
   this.nativeRow = -100;
   this.dodgingY = 0;
   this.dodgingX = 0;
+  this.dodging = 0;
+  this.returning = 0;
+  this.leftback = 0;
+  this.rightStep = 0;
   gd.Enemy.call(this,x,y,sprite,ID,direction,type);
 };
 gd.EnemySoldier.prototype = Object.create(gd.Enemy.prototype);
 gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
+
+/*
+*
+*
+* ENEMY-SOLDIER DEFINE DIRECTION FUNCTION
+*
+*
+*/
+
 
 gd.EnemySoldier.prototype.defineDirection = function(){
   
@@ -171,6 +184,14 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     upOrDown = false;
   };
   
+  // Let's make shortnamed local variables for surroundings
+  var rightFree = false; // if no enemy and not blocked on the right
+  var leftFree = false; // if no enemy and not blocked on the left
+  var topFree = false; // if no enemy and not blocked on the top
+  var belowFree = false; // if no enemy and not blocked below
+  
+  // functions to define if there are enemies and/or obstacles among
+  // neighbours in each direction;
   
   var notBlockedNoEnemy1 = function(arr){
     var types = '';
@@ -192,69 +213,111 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     } else return false;
   };
   
-  // if an EnemySoldier is moving up or right, and an opportunity appears
-  // to turn left - then turn left
-  if(((this.direction == 'up')||(this.direction == 'down'))&&(notBlockedNoEnemy1(this.rightNeighbourArr))){
-    if(gd.debugKey1){console.log(this.rightNeighbourArr)};
-    this.direction = 'right';
-    if(this.dodgingY>0){this.dodgingX++;};
-  // if right enemy is blocked, dodge further
-  } else if((this.direction == 'up')&&(blockedOrEnemy1(this.topNeighbourArr))){
-      this.dodgingX++;
+  rightFree = notBlockedNoEnemy1(this.rightNeighbourArr);
+  leftFree = notBlockedNoEnemy1(this.leftNeighbourArr);
+  topFree = notBlockedNoEnemy1(this.topNeighbourArr);
+  belowFree = notBlockedNoEnemy1(this.belowNeighbourArr);
+  
+  // local shortnamed variables to designate direction;
+  var up = false;
+  var down = false;
+  var stay = false;
+  var right = false;
+  var left = false;
+  var belowNative = false;
+  var aboveNative = false;
+  var inNative = false;
+  
+  if(this.direction == 'up'){up = true;down = false;stay = false;right = false;left = false;};
+  if(this.direction == 'down'){up = false;down = true;stay = false;right = false;left = false;};
+  if(this.direction == 'stay'){up = false;down = false;stay = true;right = false;left = false;};
+  if(this.direction == 'right'){up = false;down = false;stay = false;right = true;left = false;};
+  if(this.direction == 'left'){up = false;down = false;stay = false;right = false;left = true;};  
+
+  if(this.y > this.nativeRow*1.1){belowNative = true;};
+  if(this.y < this.nativeRow*0.9){aboveNative = true;};
+  
+  // local shortnamed variable to designate dodging;
+  var dodging = false;
+  var returning = false;
+  var steppedLeft = false;
+  var steppedRight = false;
+  
+  if(this.dodging>0){ dodging = true;} else { dodging = false;};
+  if(this.returning>0){ returning = true;} else { returning = false;};
+  
+  if((this.leftback-this.x)>gd.cellWidth){steppedLeft = true;}
+  else {steppedLeft = false;};
+  
+  if((this.x - this.rightStep)>(0.3*gd.cellWidth)&&(this.rightStep!=0)){
+    steppedRight = true;
+  };
+  
+  /* if(dodging&&(!returning)){
+    
+  } else if(returning&&(!dodging)){
+    
+  } else if((!dodging)&&(!returning){
+    
+  };*/
+  
+  if((right)&&(!rightFree)&&(!dodging)&&(!returning)){
+    if((topFree)&&(belowFree)){
+      if(upOrDown){this.direction = 'up';};
+      if(!upOrDown){this.direction = 'down';};
+    } else if(topFree){this.direction = 'up';
+    } else if (belowFree){this.direction = 'down';
+    } else if ((!topFree)&&(!belowFree)){
       this.direction = 'left';
-  }
-    else if((this.direction == 'down')&&(blockedOrEnemy1(this.belowNeighbourArr))){
-      this.dodgingX++;
-      this.direction = 'left';      
-  }
-  // if an EnemySoldier was moving left, then, as soon as an opportunity appears
-  // duck either up or down;
-    else if((this.direction == 'left')&&(notBlockedNoEnemy1(this.topNeighbourArr))){
-      this.direction = 'up';
-      this.dodgingY++;
-  } else if((this.direction == 'left')&&(notBlockedNoEnemy1(this.belowNeighbourArr))){
-      this.direction = 'down';
-      this.dodgingY++;
-  } else if ((this.direction == 'left')&&(blockedOrEnemy1(this.leftNeighbourArr))){
-  //else if((this.direction == 'left')&&((this.leftNeighbour.search('blocked')!=-1)||(this.leftNeighbour.search('enemy')!=-1))){
-      this.direction = 'right';
-//  } else if((this.direction == 'right')&&(blockedOrEnemy(this.rightNeighbour))){
-  } else if((this.direction == 'right')&&(blockedOrEnemy1(this.rightNeighbourArr))){
-    this.dodgingY++;
-    //this.x-=4;
-      if(notBlockedNoEnemy1(this.topNeighbourArr)&&notBlockedNoEnemy1(this.belowNeighbourArr)){
-        if(upOrDown){this.direction = 'up';};
-        if(!upOrDown){this.direction = 'down';};
-    } else if(notBlockedNoEnemy1(this.topNeighbourArr)){
-        this.direction = 'up';
-    } else if(notBlockedNoEnemy1(this.belowNeighbourArr)){
-        this.direction = 'down';
-    } else if (blockedOrEnemy1(this.belowNeighbourArr)&&blockedOrEnemy1(this.topNeighbourArr)){
-        this.direction = 'left';
+      this.leftback = this.x;
     };
-  } // else if
-  // if there is another enemy or an obstacle ahead, try to change direction
-  else if(((this.direction == 'right')||(this.direction == 'stay'))&&(notBlockedNoEnemy1(this.rightNeighbourArr))){
-    this.direction = 'right'; // carry on, seek and attack
-    if(this.dodgingX>1){this.dodgingX++;};
-  }; 
-   
-  if(((this.direction == 'up')||(this.direction == 'down'))&&(this.dodgingY>0)){
-    this.dodgingY++;
-  };
-  if((this.direction == 'right')&&(this.dodgingX>0)){
-    this.dodgingX++;
-  };
-  if((this.direction =='right')&&(this.y > this.nativeRow)&&(notBlockedNoEnemy1(this.topNeighbourArr))&&(this.dodgingX>60)){
+    this.dodging++;
+  } else if((!dodging)&&rightFree){
+    this.direction = 'right';
+    //if(steppedRight){this.rightStep = this.x;};
+    if(this.rightStep==0){this.rightStep = this.x};
+  } else if(dodging&&left&&steppedLeft&&topFree&&belowFree&&(!returning)){
+      if(upOrDown){this.direction = 'up';};
+      if(!upOrDown){this.direction = 'down';};
+      this.dodging++;
+      this.leftback = 0;
+  } else if(dodging&&left&&steppedLeft&&topFree&&(!returning)){
     this.direction = 'up';
-  }else if ((this.direction == 'right')&&(this.y < this.nativeRow)&&(notBlockedNoEnemy1(this.belowNeighbourArr))&&(this.dodgingX>60)){
+    this.dodging++;
+    this.leftback = 0;
+  } else if(dodging&&left&&steppedLeft&&belowFree&&(!returning)){
+    this.direction = 'down';
+    this.dodging++;
+    this.leftback = 0;
+  } else if(dodging&&(up||down)&&rightFree){
+    this.direction = 'right';
+    this.dodging = 0;
+    //if(this.rightStep==0){this.rightStep = this.x};
+    //if(steppedRight){this.rightStep = this.x;};
+  } else if(dodging&&up&&(!topFree)&&(!returning)){
+    this.direction = 'left';
+    this.leftback = this.x;
+  } else if(dodging&&down&&(!belowFree)&&(!returning)){
+    this.direction = 'left';
+    this.leftback = this.x;
+    
+  };
+  if((!dodging)&&topFree&&belowNative&&right&&steppedRight){
+    this.direction = 'up';
+  };
+  if((!dodging)&&belowFree&&aboveNative&&right&&steppedRight){
     this.direction = 'down';
   };
-  if(((this.y < 1.1*this.nativeRow)&&(this.y > 0.9*this.nativeRow))&&(this.dodgingX > 50)){this.dodgingX=0;this.dodgingY=0;};
+  if(((!belowNative)&&(!aboveNative))||dodging){
+    this.rightStep = 0;
+  };
   
-  if(gd.debugKey1){console.log();};
+//  TO ADD DODGING2 - FOR RETURNING TO NATIVE? or just dodging the obstacles or resetting?
+  
+
+  
   if(gd.debugKey1){
-    console.log(this.direction+' : ' + this.dodgingX,' ',this.dodgingY);
+    console.log(this.direction);
     console.log(this.topNeighbourArr);
     console.log(this.belowNeighbourArr);
     console.log(this.rightNeighbourArr);
@@ -267,8 +330,16 @@ gd.EnemySoldier.prototype.defineDirection = function(){
   this.leftNeighbourArr = [];
   this.topNeighbourArr = [];
   this.belowNeighbourArr = [];
-}; // defineDirection function
+}; 
 
+
+
+/*
+//   END OF   defineDirection function
+*
+*    
+*
+*/
 
 gd.EnemySoldierWild = function(x,y,sprite,ID){
   this.type = 'SoldierWild';

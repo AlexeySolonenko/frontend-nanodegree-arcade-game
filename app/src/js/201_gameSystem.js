@@ -104,19 +104,19 @@ gd.checkCollisions = function(obj1,obj2){
       dtXabs = (Math.abs(obj1.x - obj2.x));
       dtYabs = (Math.abs(obj1.y - obj2.y));
 
-      if((dtX < 0)&&(dtXabs <= gd.cellWidth*0.7)&&(dtXabs >= gd.cellWidth*0.5)&&(dtYabs <= gd.cellHeight)){
+      if((dtX < 0)&&(dtXabs <= gd.cellWidth)/*&&(dtXabs >= gd.cellWidth*0.5)*/&&(dtYabs <= gd.cellHeight*0.8)){
         result = result + ' atright';
         if(obj1.rightNeighbourArr.indexOf(obj2.ID)==-1){obj1.rightNeighbourArr.push(obj2.ID);};
       };
-      if((dtX > 0)&&(dtXabs <= gd.cellWidth*0.7)&&(dtXabs >= gd.cellWidth*0.5)&&(dtXabs <= gd.cellWidth)&&(dtYabs <= gd.cellHeight)){
+      if((dtX > 0)&&(dtXabs <= gd.cellWidth)/*&&(dtXabs >= gd.cellWidth*0.5)*/&&(dtXabs <= gd.cellWidth)&&(dtYabs <= gd.cellHeight*0.8)){
         result = result + ' atleft';
         if(obj1.leftNeighbourArr.indexOf(obj2.ID)==-1){obj1.leftNeighbourArr.push(obj2.ID);};
       };
-      if((dtY < 0)&&(dtYabs >= gd.cellHeight*0.5)&&(dtYabs < gd.cellHeight*0.7)&&(dtXabs <= gd.cellWidth)){
+      if((dtY < 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs < gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
         result = result + ' below';
         if(obj1.belowNeighbourArr.indexOf(obj2.ID)==-1){obj1.belowNeighbourArr.push(obj2.ID);};
       };//dfg
-      if((dtY > 0)&&(dtYabs >= gd.cellHeight*0.5)&&(dtYabs < gd.cellHeight*0.7)&&(dtXabs <= gd.cellWidth)){
+      if((dtY > 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs < gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
         result = result + ' atop';
         if(obj1.topNeighbourArr.indexOf(obj2.ID)==-1){obj1.topNeighbourArr.push(obj2.ID);};
       };
