@@ -15,30 +15,71 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-theme.min.css"> -->
 </head>
+
 <body>
 
-  <div class="aboveCanvasHoveringHTMLDiv userTest" style="position:relative;">
-  <!--
-          <div class=" userTest" style="position:absolute; left:300px; top:100px; z-index:500; background-color:red;">test</div>
-          --> 
-          <div class="healthScore">HEALTH:</div>
-          <div class="playerName"><h3>%data%</h3></div>
-  </div>
+<!-- 
+-- html block 
+-- DIV ATOP OF CANVAS
+-- Deliberately put outside of main bootstrap container.
+-- Serves for tieing html components above canvas.
+-- Responsive and updated each cycle/frame.
+-->  
+
+    <div class="html-atop-canvas user-test" >
+      
+    <!--
+            <div class=" user-test" style="position:absolute; left:300px; top:100px; z-index:500; background-color:red;">test</div>
+            --> 
+            <div class="health-bar">HEALTH:</div>
+            <div class="player-name"><h3>%data%</h3></div>
+    </div>
+ 
+ <!-- 
+-- END OF html block 
+-- DIV ATOP OF CANVAS
+-->  
+
+
+<!-- 
+-- html block 
+-- MAIN CONTAINER
+-- stores all permanently visible active game elements
+-->  
 
   <div class="container-fluid">
+
+<!-- 
+-- html block 
+-- INFORMATION PANEL
+-->  
     <div class = "row">
-      <h3 class="infoPanel panel panel-default"></h3>
+      <h3 class="col-xs-12 info-panel panel panel-default"></h3>
     </div>
+
+<!-- 
+-- END OF  html block 
+-- INFORMATION PANEL
+-->      
+
+
+<!-- 
+-- html block 
+-- GAME
+-- Contains controls, menu and game canvas.
+-- Must always fit screen size and do not call scroll bars.
+-->  
+
     <div class="row"> <!-- Whole game div. Put all game here. Must always fit the current screen size. -->
       
       <!-- game menu div -->
-      <!-- <div class="gameMenuDiv col-xs-12 col-sm-12 col-md-1 col-lg-1 userTest"> -->
-      <div class="gameMenuDiv userTest">
-        <div class="row userTest">
-          <div class="userTest">
+      <!-- <div class="gameMenuDiv col-xs-12 col-sm-12 col-md-1 col-lg-1 user-test"> -->
+      <div class="gameMenuDiv user-test">
+        <div class="row user-test">
+          <div class="user-test">
             <button class="btn btn-block btnMenu btn-lg btn-default">MENU</button>
           </div>
-          <div class="userTest">
+          <div class="user-test">
             <button class="btn btnPause btn-block btn-lg btn-default">PAUSE</button>
           </div>
         </div>
@@ -46,67 +87,112 @@
       
       <!--Append game canvas here. Game canvas dims are calculated automatically. see js. -->
       
-      <div class="canvasDiv userTest">
+      <div class="canvas-div user-test">
 
         
       </div><!-- main game canvas div -->
     
       <!-- Controls div. Put arrows and other extra buttons, if any, here -->
-      <div class="controlsDiv userTest">
-        <div class="row userTest">
-          <div class="userTest btnUp col-xs-offset-4 col-xs-4">
+      <div class="controlsDiv user-test">
+        <div class="row user-test">
+          <div class="user-test btnUp col-xs-offset-4 col-xs-4">
             <button class="btn btn-lg btn-default btn-block"><span class="glyphicon glyphicon-chevron-up"></span></button>
           </div><!-- up arrow -->
-          <div class="userTest btnSpacer invisible col-xs-12 ">
+          <div class="user-test btnSpacer invisible col-xs-12 ">
             <p>bla bla</p>
           </div><!-- spacer div -->
-          <div class="userTest btnLeft col-xs-4">
+          <div class="user-test btnLeft col-xs-4">
             <button class="btn-lg btn btn-block btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
           </div><!-- left arrow -->
-          <div class="userTest btnDn col-xs-4">
-            <button class="btn btn-lg btn-block btn-default"><span class="glyphicon glyphicon-chevron-down"></span></button>
-          </div><!-- down arrow -->
-          <div class="userTest btnRight col-xs-4">
+
+          <div class="user-test btnRight col-xs-4">
             <button class="btn-lg btn btn-block btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
           </div><!-- right arrow -->
+  
+          <div class="user-test btnSpacer invisible col-xs-12 ">
+            <p>bla bla</p>
+          </div><!-- spacer div -->          
+          <div class="user-test btnDn col-xs-4">
+            <button class="btn btn-lg btn-block btn-default"><span class="glyphicon glyphicon-chevron-down"></span></button>
+          </div><!-- down arrow -->
         </div>
       </div><!-- Controls div. -->
     </div><!-- Whole game div -->
     
+       <button type="button" class="btnPlayerSprite btn btn-default">
+    PLAYER SPRITE
+    </button>
 
-    
+
     <div class="modal fade gameMenuModal1" tabindex="-1" role="dialog" aria-labelledby="gameMenuModal1Label" >
-
       <div class="modal-dialog" role="document">
-        <div class="modal-content ">
-          <div class="modal-header">
-            <button type="button" class=" user-modal-intro-button1 close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <div><h4 class="modal-title user-modal-intro-label center-block">GAME MENU</h4></div>
-          </div>
-          <div class="modal-body row">
-            <div class="userTest col-xs-3">
-              test
-            </div>
-            <div class="userTest col-xs-3">
-              test
-              test
-            </div>
-            <div class="userTest col-xs-3">
-              test
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn user-modal-intro-button1 btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>  <!-- END OF INTRO MODAL -->
+            <div class="modal-content ">
+              <div class="modal-header">
+                <button type="button" class=" user-modal-intro-button1 close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div><h4 class="modal-title user-modal-intro-label center-block">GAME MENU</h4></div>
+              </div>
+              <div class="modal-body">
+              <div class="row">
+                <div class="user-test col-xs-3">
+                  test
+                </div>
+                <div class="user-test col-xs-3">
+                  test
+                  test
+                </div>
+                <div class="user-test col-xs-3">
+                  test
+                </div>
+              </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn user-modal-intro-button1 btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- /.modal-content -->
+         </div><!-- /.modal-dialog -->
+      </div>  <!-- END OF INTRO MODAL -->
 
+      
+<!-- 
+-- html block 
+-- PLAYER SPRITE MODAL
+--> 
+    <div class="modal fade user-modal-player-sprite" tabindex="-1" role="dialog" aria-labelledby="user-modal-player-sprite-Label" >
+      <div class="modal-dialog" role="document">
+            <div class="modal-content ">
+              <div class="modal-header">
+                <button type="button" class=" user-modal-player-sprite-button1 close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div><h4 class="modal-title user-modal-player-sprite-label center-block">SELECT HOW YOUR PLAYER LOOKS</h4></div>
+              </div>
+              <div class="modal-body row">
+                <div class="user-test col-xs-3">
+                  test
+                </div>
+                <div class="user-test col-xs-3">
+                  test
+                  test
+                </div>
+                <div class="user-test col-xs-3">
+                  test
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn user-modal-player-sprite-button1 btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- /.modal-content -->
+         </div><!-- /.modal-dialog -->
+      </div>  <!-- END OF MODAL PLAYER SPRITE-->
+<!-- 
+-- END OF html block 
+-- PLAYER SPRITE MODAL
+--> 
 
-
-
+      
   </div><!-- main bootstrap container-fluid -->
-    <!-- TO ADD - STATUS WINDOW - NAVIGATION, PAUSE, ETC. -->
+<!-- 
+-- END OF html block 
+-- MAIN CONTAINER
+-->  
 
 
     

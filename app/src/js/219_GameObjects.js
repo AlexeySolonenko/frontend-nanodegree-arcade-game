@@ -46,16 +46,28 @@ gd.MovingObject.prototype.move = function(dt){
   if(this.direction == 'up'){this.y = this.y - incr;};  
   if(this.direction == 'stay'){this.x = this.x; this.y = this.y;};
  
-  /*
-  if(this.direction == 'right'){this.x = this.x + dt*this.speed*gd.movementFrozen;};
-  if(this.direction == 'left'){this.x = this.x - dt*this.speed*gd.movementFrozen;};
-  if(this.direction == 'down'){this.y = this.y + dt*this.speed*gd.movementFrozen;};
-  if(this.direction == 'up'){this.y = this.y - dt*this.speed*gd.movementFrozen;};  
-  if(this.direction == 'stay'){this.x = this.x; this.y = this.y;};
-  */
+
 };
 
-
+gd.notBlockedNoEnemy1 = function(arr){
+  var types = '';
+  for(var i = 0;i<arr.length;i++){
+    types += gd.allGameObjects[arr[i]].type;    
+  };
+  if((types.search('blocked')==-1)&&(types.search('enemy')==-1)){
+    return true;
+  } else return false;
+};
+  
+gd.blockedOrEnemy1 = function(arr){
+  var types = '';
+  for(var i = 0;i<arr.length;i++){
+    types += gd.allGameObjects[arr[i]].type;    
+  };
+  if((types.search('blocked')!=-1)||(types.search('enemy')!=-1)){
+    return true;
+  } else return false;
+};
 
 
 

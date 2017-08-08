@@ -21,7 +21,7 @@ if (gd.paused == true)
     gd.paused = false;
     gd.gamePaused = 1;
     gd.movementFrozen = 1;
-    document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
+    document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";
     //window.requestAnimationFrame(main);
   }
 else
@@ -29,10 +29,19 @@ else
     gd.paused = true;
     gd.gamePaused = 0;
     gd.movementFrozen = 0;
-    document.getElementsByClassName('infoPanel')[0].textContent = "Game is paused.";
+    document.getElementsByClassName('info-panel')[0].textContent = "Game is paused.";
   };
 };
+gd.debugKey1Flip = function(){
+  if(gd.debugKey1==true){gd.debugKey1=false}
+  else{gd.debugKey1 = true;};
+};
 
+
+gd.allGameObjects = [];
+for (var i = 0;i<200;i++){
+  gd.allGameObjects[i] = 'free';
+};
 
 
 /*
@@ -49,10 +58,10 @@ else
 */
 
 gd.resetPosRelations = function(obj){
- if(obj.hasOwnProperty('rightNeighbourArr')){obj.rightNeighbour=[];};
- if(obj.hasOwnProperty('leftNeighbourArr')){obj.leftNeighbour=[];};
- if(obj.hasOwnProperty('topNeighbourArr')){obj.topNeighbour=[];};
- if(obj.hasOwnProperty('belowNeighbourArr')){obj.belowNeighbour=[];};
+ if(obj.hasOwnProperty('rightNeighbourArr')){obj.rightNeighbourArr=[];};
+ if(obj.hasOwnProperty('leftNeighbourArr')){obj.leftNeighbourArr=[];};
+ if(obj.hasOwnProperty('topNeighbourArr')){obj.topNeighbourArr=[];};
+ if(obj.hasOwnProperty('belowNeighbourArr')){obj.belowNeighbourArr=[];};
  if(obj.hasOwnProperty('collidees')){obj.collidees=[];};
 };
 
@@ -112,11 +121,11 @@ gd.checkCollisions = function(obj1,obj2){
         result = result + ' atleft';
         if(obj1.leftNeighbourArr.indexOf(obj2.ID)==-1){obj1.leftNeighbourArr.push(obj2.ID);};
       };
-      if((dtY < 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs < gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
+      if((dtY < 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs <= gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
         result = result + ' below';
         if(obj1.belowNeighbourArr.indexOf(obj2.ID)==-1){obj1.belowNeighbourArr.push(obj2.ID);};
       };//dfg
-      if((dtY > 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs < gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
+      if((dtY > 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs <= gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
         result = result + ' atop';
         if(obj1.topNeighbourArr.indexOf(obj2.ID)==-1){obj1.topNeighbourArr.push(obj2.ID);};
       };
@@ -162,21 +171,36 @@ gd.checkCollisions = function(obj1,obj2){
   // result = 'Arguments could not be resolved. Expect arg1 [] or {}, arg2 [] or {}';
   return result;
   
-}; // checkCollisions function
+}; 
+/** 
+*
+*  END OF checkCollisions = function()
+*
+*/ 
 
 
+/**
+*  findCurrentPositions = function()
+*  update object position data in relation to each other
+* 
+*/
 
-
-gd.debugKey1Flip = function(){
-  if(gd.debugKey1==true){gd.debugKey1=false}
-  else{gd.debugKey1 = true;};
+gd.findCurrentPositions = function() {
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i] != 'free'){
+      gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects); 
+    };
+  };
 };
 
 
-gd.allGameObjects = [];
-for (var i = 0;i<200;i++){
-  gd.allGameObjects[i] = 'free';
+gd.resetPosRelationsOfAll = function() {
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    gd.resetPosRelations(gd.allGameObjects[i]);
+  };
 };
+
+
 
 
 

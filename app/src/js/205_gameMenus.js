@@ -36,13 +36,16 @@ gd.gameMenuModal1 = '<div class="gameMenuModal1"></div>';
 document.getElementsByClassName('btnMenu')[0].onclick = function(){
         
         //document.getElementsByClassName('gameMenuModal1')[0].modal('show');
-        if(!gd.paused){
-          gd.pause();
-        } else {
-          
+        if(!gd.paused) { gd.pause();
+        } else {  
         };
         $('.gameMenuModal1').modal('show');
 };
 
 gd.health = 50;
+
+document.getElementsByClassName('btnPlayerSprite')[0].onclick = function(){
+   $('.user-modal-player-sprite').modal('show');
+};
+
 

@@ -27,10 +27,12 @@ gd.Player = function(sprite,ID){
   this.topNeighbour = 'free';
   this.belowNeighbour = 'free';
   this.type = 'player';
+  this.outOfBorders = false;
   gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
 gd.Player.prototype = Object.create(gd.MovingObject.prototype);
 gd.Player.prototype.constructor = gd.Player;
+
 
 gd.Player.prototype.update = function(dt){
   
@@ -53,6 +55,7 @@ gd.Player.prototype.dying = function(){
   this.returnToStart();
 };
  
+ 
 gd.Player.prototype.render = function(){
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
@@ -60,43 +63,44 @@ gd.Player.prototype.render = function(){
 
 
 gd.Player.prototype.moveLeft = function(){
-  var obstacleAtLeft = false;
-  obstacleAtLeft = !(gd.checkCollisions(gd.landscape.objects,this).search('atright')== -1);
-  if((this.x > 0)&&(!obstacleAtLeft)){
+  var noObstacleAtLeft = false;
+  noObstacleAtLeft = gd.notBlockedNoEnemy1(this.leftNeighbourArr);;
+  if( ((this.x - 0.9*gd.cellWidth)>0)&&noObstacleAtLeft){
       this.x = this.x-gd.cellWidth*gd.movementFrozen;
   }
   else {this.cannotDoIt();};
-
 };
 
 gd.Player.prototype.moveRight = function(){
-  var obstacleAtRight = false;
-  obstacleAtRight = !(gd.checkCollisions(gd.landscape.objects,this).search('atleft') == -1);
+  var noOstacleAtRight = false;
+  noObstacleAtRight = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
   var notBeyondRightBorder = false;
   notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
-  if(!obstacleAtRight && notBeyondRightBorder){
+  if(noObstacleAtRight&&notBeyondRightBorder){
     this.x = this.x + gd.cellWidth*gd.movementFrozen;
   } else{
     this.cannotDoIt();
   };
 };
 
-gd.Player.prototype.moveUp = function(){
-  var obstacleAtop = false;
-  obstacleAtop = !(gd.checkCollisions(gd.landscape.objects,this).search('below') == -1);
-  if((this.y>0)&&(!obstacleAtop)){
+gd.Player.prototype.moveUp = function() {
+  var noObstacleAtop = false;
+  noObstacleAtop = gd.notBlockedNoEnemy1(this.topNeighbourArr);
+  if(gd.debugKey1){console.log(this.topNeighbourArr);};
+  if(((this.y-0.1*gd.cellHeight)>0)&&noObstacleAtop) {
     this.y = this.y - gd.cellHeight*gd.movementFrozen;
   } else {
     this.cannotDoIt();
   };
 };
 
+
 gd.Player.prototype.moveDown = function(){
   var notBeyondBottomBorder = false;
   notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
-  var obstacleBelow = false;
-  obstacleBelow = !(gd.checkCollisions(gd.landscape.objects,this).search('atop') == -1);
-  if(notBeyondBottomBorder&&!obstacleBelow){
+  var noObstacleBelow = false;
+  noObstacleBelow = gd.notBlockedNoEnemy1(this.belowNeighbourArr);
+  if(notBeyondBottomBorder&&noObstacleBelow){
     this.y = this.y + gd.cellHeight*gd.movementFrozen;
   }else{
     this.cannotDoIt();

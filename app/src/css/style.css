@@ -4,18 +4,24 @@ body {
 }
 */
 
-.userTest{
+.user-test{
   border: 1px solid black;
   
 }
 
-.healthScore{
-  background-color:red;
-  position:absolute;
-  z-index:502; 
+.html-atop-canvas{
+    position: relative;
+    width: 25%;
 }
 
-.playerName{
+
+.health-bar{
+  background-color: red;
+  position: absolute;
+  z-index: 502; 
+}
+
+.player-name{
   position:absolute;
   color: #D0F8FF;
   /*
@@ -32,12 +38,52 @@ body {
   z-index : 503;
 }
 
-.canvasDiv, .controlsDiv, .gameMenuDiv,
-.btnUp, .btnLeft, .btnDn, .btnRight, .btnPause,
-.btnSpacer, .infoPanel, .canvasContainer,
+/*
+*
+*    CLASS NAMES AS IDs
+*    Class names used as IDs to address
+*    elements in JS.
+*
+*/
+
+
+
+.canvas-div, .controlsDiv, .canvasContainer,
 .canvasStoneField, .screenHoriz, .screenVert,
-.gameMenuModal1, .gameMenuModal1Label, .btnMenu,
-.aboveCanvasHoveringHTMLDiv, .userTest2, .healthScoreSpan
+ .userTest2, .health-bar-span, 
+{}
+
+
+/*
+*   PERMANENT MENU AND CONTROLS IDs
+*/
+.gameMenuDiv,
+.btnUp,
+.btnLeft,
+.btnDn,
+.btnRight,
+.btnPause,
+.btnSpacer,
+.info-panel,
+.btnMenu
+{}
+
+/*
+*   GAME MENU MODAL IDs
+*/
+
+.gameMenuModal1,
+.gameMenuModal1Label
+{}
+
+/*
+*   PLAYER SPRITE MODAL IDs
+*/
+
+.user-modal-player-sprite,
+.user-modal-player-sprite-button1,
+.user-modal-player-sprite-label,
+.btnPlayerSprite
 {}
 
 

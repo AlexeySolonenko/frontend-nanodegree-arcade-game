@@ -45,51 +45,7 @@ gd.Enemy.prototype.dying = function(){
 gd.Enemy.prototype.cannotDoIt = function(){
   
 };
-/*
-gd.Enemy.prototype.moveLeft = function(){
-var obstacleAtLeft = false;
-obstacleAtLeft = !(gd.checkCollisions(gd.landscape.objects,this).search('atright')== -1);
-if((this.x > 0)&&(!obstacleAtLeft)){
-this.x = this.x-gd.cellWidth*gd.movementFrozen;
-}
-else {this.cannotDoIt();};
 
-};
-
-gd.Enemy.prototype.moveRight = function(){
-var obstacleAtRight = false;
-obstacleAtRight = !(gd.checkCollisions(gd.landscape.objects,this).search('atleft') == -1);
-var notBeyondRightBorder = false;
-notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
-if(!obstacleAtRight && notBeyondRightBorder){
-this.x = this.x + gd.cellWidth*gd.movementFrozen;
-} else{
-this.cannotDoIt();
-};
-};
-
-gd.Enemy.prototype.moveUp = function(){
-var obstacleAtop = false;
-obstacleAtop = !(gd.checkCollisions(gd.landscape.objects,this).search('below') == -1);
-if((this.y>0)&&(!obstacleAtop)){
-this.y = this.y - gd.cellHeight*gd.movementFrozen;
-} else {
-this.cannotDoIt();
-};
-};
-
-gd.Enemy.prototype.moveDown = function(){
-var notBeyondBottomBorder = false;
-notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
-var obstacleBelow = false;
-obstacleBelow = !(gd.checkCollisions(gd.landscape.objects,this).search('atop') == -1);
-if(notBeyondBottomBorder&&!obstacleBelow){
-this.y = this.y + gd.cellHeight*gd.movementFrozen;
-}else{
-this.cannotDoIt();
-};
-};
-*/
 /*
 *
 *
@@ -104,7 +60,7 @@ gd.Enemy.prototype.eraser = function(){
   if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
     gd.allGameObjects[this.ID] = 'free';
   };
-  if(this.y > ((document.getElementsByTagName("CANVAS")[0].height) + gd.cellHeight)) {
+  if(this.y > ((document.getElementsByTagName("CANVAS")[0].height) - 2*gd.cellHeight)) {
     gd.allGameObjects[this.ID] = 'free';
   };
   if(this.x < (0 - 6*gd.cellWidth)) {
@@ -113,11 +69,13 @@ gd.Enemy.prototype.eraser = function(){
   if(this.y < (-gd.cellHeight*0.5)) {
     gd.allGameObjects[this.ID] = 'free';
   };
+  if(this.leftattempts > 30){
+    gd.allGameObjects[this.ID] = 'free';
+  };
 };
 
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+// @param: dt, a time delta between ticks
 gd.Enemy.prototype.update = function(dt){
   // You should multiply any movement by the dt parameter
   // which will ensure the game runs at the same speed for
@@ -152,12 +110,10 @@ gd.Enemy.prototype.render = function() {
 */
 gd.EnemySoldier = function(x,y,sprite,ID,direction,type){
   this.nativeRow = -100;
-  this.dodgingY = 0;
-  this.dodgingX = 0;
   this.dodging = 0;
-  this.returning = 0;
   this.leftback = 0;
   this.rightStep = 0;
+  this.leftattempts = 0;
   gd.Enemy.call(this,x,y,sprite,ID,direction,type);
 };
 gd.EnemySoldier.prototype = Object.create(gd.Enemy.prototype);
@@ -213,10 +169,10 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     } else return false;
   };
   
-  rightFree = notBlockedNoEnemy1(this.rightNeighbourArr);
-  leftFree = notBlockedNoEnemy1(this.leftNeighbourArr);
-  topFree = notBlockedNoEnemy1(this.topNeighbourArr);
-  belowFree = notBlockedNoEnemy1(this.belowNeighbourArr);
+  rightFree = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
+  leftFree = gd.notBlockedNoEnemy1(this.leftNeighbourArr);
+  topFree = gd.notBlockedNoEnemy1(this.topNeighbourArr);
+  belowFree = gd.notBlockedNoEnemy1(this.belowNeighbourArr);
   
   // local shortnamed variables to designate direction;
   var up = false;
@@ -234,34 +190,32 @@ gd.EnemySoldier.prototype.defineDirection = function(){
   if(this.direction == 'right'){up = false;down = false;stay = false;right = true;left = false;};
   if(this.direction == 'left'){up = false;down = false;stay = false;right = false;left = true;};  
 
-  if(this.y > this.nativeRow*1.1){belowNative = true;};
-  if(this.y < this.nativeRow*0.9){aboveNative = true;};
+  if(this.y > this.nativeRow*1.05){belowNative = true;};
+  if(this.y < this.nativeRow*0.95){aboveNative = true;};
   
   // local shortnamed variable to designate dodging;
   var dodging = false;
-  var returning = false;
   var steppedLeft = false;
   var steppedRight = false;
   
   if(this.dodging>0){ dodging = true;} else { dodging = false;};
-  if(this.returning>0){ returning = true;} else { returning = false;};
   
-  if((this.leftback-this.x)>gd.cellWidth){steppedLeft = true;}
+  if((this.leftback-this.x)>(0.3*gd.cellWidth)){steppedLeft = true;}
   else {steppedLeft = false;};
   
   if((this.x - this.rightStep)>(0.3*gd.cellWidth)&&(this.rightStep!=0)){
     steppedRight = true;
   };
   
-  /* if(dodging&&(!returning)){
+  /* if(dodging){
     
   } else if(returning&&(!dodging)){
     
-  } else if((!dodging)&&(!returning){
+  } else if((!dodging){
     
   };*/
   
-  if((right)&&(!rightFree)&&(!dodging)&&(!returning)){
+  if((right)&&(!rightFree)&&(!dodging)){
     if((topFree)&&(belowFree)){
       if(upOrDown){this.direction = 'up';};
       if(!upOrDown){this.direction = 'down';};
@@ -276,28 +230,26 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     this.direction = 'right';
     //if(steppedRight){this.rightStep = this.x;};
     if(this.rightStep==0){this.rightStep = this.x};
-  } else if(dodging&&left&&steppedLeft&&topFree&&belowFree&&(!returning)){
+  } else if(dodging&&left&&steppedLeft&&topFree&&belowFree){
       if(upOrDown){this.direction = 'up';};
       if(!upOrDown){this.direction = 'down';};
       this.dodging++;
       this.leftback = 0;
-  } else if(dodging&&left&&steppedLeft&&topFree&&(!returning)){
+  } else if(dodging&&left&&steppedLeft&&topFree){
     this.direction = 'up';
     this.dodging++;
     this.leftback = 0;
-  } else if(dodging&&left&&steppedLeft&&belowFree&&(!returning)){
+  } else if(dodging&&left&&steppedLeft&&belowFree){
     this.direction = 'down';
     this.dodging++;
     this.leftback = 0;
   } else if(dodging&&(up||down)&&rightFree){
     this.direction = 'right';
     this.dodging = 0;
-    //if(this.rightStep==0){this.rightStep = this.x};
-    //if(steppedRight){this.rightStep = this.x;};
-  } else if(dodging&&up&&(!topFree)&&(!returning)){
+  } else if(dodging&&up&&(!topFree)){
     this.direction = 'left';
     this.leftback = this.x;
-  } else if(dodging&&down&&(!belowFree)&&(!returning)){
+  } else if(dodging&&down&&(!belowFree)){
     this.direction = 'left';
     this.leftback = this.x;
     
@@ -311,33 +263,12 @@ gd.EnemySoldier.prototype.defineDirection = function(){
   if(((!belowNative)&&(!aboveNative))||dodging){
     this.rightStep = 0;
   };
-  
-//  TO ADD DODGING2 - FOR RETURNING TO NATIVE? or just dodging the obstacles or resetting?
-  
-
-  
-  if(gd.debugKey1){
-    console.log(this.direction);
-    console.log(this.topNeighbourArr);
-    console.log(this.belowNeighbourArr);
-    console.log(this.rightNeighbourArr);
-  };
-  this.leftNeighbour = 'free';
-  this.rightNeighbour = 'free';
-  this.topNeighbour = 'free';
-  this.belowNeighbour = 'free';
-  this.rightNeighbourArr = [];
-  this.leftNeighbourArr = [];
-  this.topNeighbourArr = [];
-  this.belowNeighbourArr = [];
+  if(left){this.leftattempts++;};
 }; 
 
-
-
-/*
-//   END OF   defineDirection function
-*
-*    
+/**
+* 
+* END OF   defineDirection function   
 *
 */
 
@@ -376,9 +307,9 @@ i = 1;
 gd.swarmEnemies = function(){
   
   
-  for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
+  //for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
     
-    //  for(var i = 0,j=0, k=0;i<((gd.numRows-2)*2+gd.getRandomInt(0,8));i++){
+  for(var i = 0,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3));i++){
     j++;
     if(j>(gd.numRows-3)){j=0;};
     // j++;

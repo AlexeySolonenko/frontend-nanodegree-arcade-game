@@ -239,7 +239,7 @@ if (gd.paused == true)
     gd.paused = false;
     gd.gamePaused = 1;
     gd.movementFrozen = 1;
-    document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
+    document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";
     //window.requestAnimationFrame(main);
   }
 else
@@ -247,10 +247,19 @@ else
     gd.paused = true;
     gd.gamePaused = 0;
     gd.movementFrozen = 0;
-    document.getElementsByClassName('infoPanel')[0].textContent = "Game is paused.";
+    document.getElementsByClassName('info-panel')[0].textContent = "Game is paused.";
   };
 };
+gd.debugKey1Flip = function(){
+  if(gd.debugKey1==true){gd.debugKey1=false}
+  else{gd.debugKey1 = true;};
+};
 
+
+gd.allGameObjects = [];
+for (var i = 0;i<200;i++){
+  gd.allGameObjects[i] = 'free';
+};
 
 
 /*
@@ -267,10 +276,10 @@ else
 */
 
 gd.resetPosRelations = function(obj){
- if(obj.hasOwnProperty('rightNeighbourArr')){obj.rightNeighbour=[];};
- if(obj.hasOwnProperty('leftNeighbourArr')){obj.leftNeighbour=[];};
- if(obj.hasOwnProperty('topNeighbourArr')){obj.topNeighbour=[];};
- if(obj.hasOwnProperty('belowNeighbourArr')){obj.belowNeighbour=[];};
+ if(obj.hasOwnProperty('rightNeighbourArr')){obj.rightNeighbourArr=[];};
+ if(obj.hasOwnProperty('leftNeighbourArr')){obj.leftNeighbourArr=[];};
+ if(obj.hasOwnProperty('topNeighbourArr')){obj.topNeighbourArr=[];};
+ if(obj.hasOwnProperty('belowNeighbourArr')){obj.belowNeighbourArr=[];};
  if(obj.hasOwnProperty('collidees')){obj.collidees=[];};
 };
 
@@ -330,11 +339,11 @@ gd.checkCollisions = function(obj1,obj2){
         result = result + ' atleft';
         if(obj1.leftNeighbourArr.indexOf(obj2.ID)==-1){obj1.leftNeighbourArr.push(obj2.ID);};
       };
-      if((dtY < 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs < gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
+      if((dtY < 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs <= gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
         result = result + ' below';
         if(obj1.belowNeighbourArr.indexOf(obj2.ID)==-1){obj1.belowNeighbourArr.push(obj2.ID);};
       };//dfg
-      if((dtY > 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs < gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
+      if((dtY > 0)&&/*(dtYabs >= gd.cellHeight*0.5)&&*/(dtYabs <= gd.cellHeight)&&(dtXabs <= gd.cellWidth*0.8)){
         result = result + ' atop';
         if(obj1.topNeighbourArr.indexOf(obj2.ID)==-1){obj1.topNeighbourArr.push(obj2.ID);};
       };
@@ -380,21 +389,36 @@ gd.checkCollisions = function(obj1,obj2){
   // result = 'Arguments could not be resolved. Expect arg1 [] or {}, arg2 [] or {}';
   return result;
   
-}; // checkCollisions function
+}; 
+/** 
+*
+*  END OF checkCollisions = function()
+*
+*/ 
 
 
+/**
+*  findCurrentPositions = function()
+*  update object position data in relation to each other
+* 
+*/
 
-
-gd.debugKey1Flip = function(){
-  if(gd.debugKey1==true){gd.debugKey1=false}
-  else{gd.debugKey1 = true;};
+gd.findCurrentPositions = function() {
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i] != 'free'){
+      gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects); 
+    };
+  };
 };
 
 
-gd.allGameObjects = [];
-for (var i = 0;i<200;i++){
-  gd.allGameObjects[i] = 'free';
+gd.resetPosRelationsOfAll = function() {
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    gd.resetPosRelations(gd.allGameObjects[i]);
+  };
 };
+
+
 
 
 
@@ -418,9 +442,11 @@ gd.spriteWidth = 50;
 gd.spriteHeight = 80;
 gd.numRows = 5;
 gd.numCols = 6;
+gd.numRowsPrev = 5;
+gd.numColsPrev = 6;
 gd.windowVertical = false;
 gd.windowHorizontal = false;
-
+gd.layoutChanged = false;
 
 /*
 *
@@ -431,32 +457,49 @@ gd.windowHorizontal = false;
 * TAKES CARE OF RESPONSIVE LAYOUT
 */
 
-gd.setupGrid = function(){
+gd.calculateGrid = function(ctx, canvas){
   // find if window is vertical or horizontal
   if(window.innerWidth < window.innerHeight){
     gd.windowVertical = true;
     gd.windowHorizontal = false;
-  }
-  else if(window.innerWidth > window.innerHeight){
+  } else if(window.innerWidth > window.innerHeight){
     gd.windowVertical = false;
     gd.windowHorizontal = true;    
   };
 
   var maxCanvasWidth = 0; //
-  if (gd.windowVertical)
-    {maxCanvasWidth = window.innerWidth * 1;}
-  else
-    {maxCanvasWidth = window.innerWidth * 0.75;}; // in horizontal canvas takes only 9/12 of the grid;
+  if (gd.windowVertical) {
+    maxCanvasWidth = window.innerWidth * 1;
+  } else {
+    maxCanvasWidth = window.innerWidth * 0.75;
+  }; // in horizontal canvas takes only 9/12 of the grid;
+  
   var maxCanvasWidth = maxCanvasWidth -60; // -30 for Bootstrap grid padding L+R
+  
   gd.numCols = (maxCanvasWidth - maxCanvasWidth % gd.cellWidth) / gd.cellWidth - 2;
-  if(gd.windowVertical){
+  
+  if (gd.windowVertical) {
     gd.numRows = (window.innerHeight*0.5 - (window.innerHeight*0.5) % gd.cellHeight-gd.cellHeight)/ gd.cellHeight;
-  }
-  else if(gd.windowHorizontal){
+  } else if (gd.windowHorizontal) {
     gd.numRows = (window.innerHeight - (window.innerHeight) % gd.cellHeight - gd.cellHeight)/ gd.cellHeight - 1;
   };
   
+  canvas.width = gd.numCols*gd.cellWidth;
+  canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
+  
+  if ((gd.numColsPrev!=gd.numCols)||(gd.numRowsPrev!=gd.numRows)) {
+    gd.layoutChanged = true;
+  } else {
+    gd.layoutChanged = false;
+  }
+  gd.numColsPrev = gd.numCols;
+  gd.numRowsPrev = gd.numRows;
+  
+     
+}; // END OF calculateGrid = function(ctx,canvas)
 
+
+gd.updateHTML = function() {
   /* Change layout depending on position of user agent
    * Use bootstrap standard classes.
    *
@@ -467,40 +510,40 @@ gd.setupGrid = function(){
     // main layout
     document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
     document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('canvasDiv')[0].classList.remove('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
-    document.getElementsByClassName('canvasDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
+    document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
+    document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('controlsDiv')[0].classList.remove('col-xs-3', 'col-sm-3', 'col-md-3', 'col-lg-3');
     document.getElementsByClassName('controlsDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     // buttons
-    document.getElementsByClassName('btnUp')[0].classList.remove('col-xs-6', 'col-xs-offset-0')
+    document.getElementsByClassName('btnUp')[0].classList.remove('col-xs-6', 'col-xs-offset-3')
     document.getElementsByClassName('btnUp')[0].classList.add('col-xs-offset-4', 'col-xs-4');
-    document.getElementsByClassName('btnSpacer')[0].classList.remove('hidden-xs', 'hidden-sm', 'hidden-md', 'hidden-lg');
+    //document.getElementsByClassName('btnSpacer')[0].classList.remove('hidden-xs', 'hidden-sm', 'hidden-md', 'hidden-lg');
     //document.getElementsByClassName('btnSpacer')[0].classList.add('col-xs-offset-4' 'col-xs-4');
     document.getElementsByClassName('btnLeft')[0].classList.remove('col-xs-6');
     document.getElementsByClassName('btnLeft')[0].classList.add('col-xs-4');
-    document.getElementsByClassName('btnDn')[0].classList.remove('col-xs-6');
-    document.getElementsByClassName('btnDn')[0].classList.add('col-xs-4');
+    document.getElementsByClassName('btnDn')[0].classList.remove('col-xs-6','col-xs-offset-3');
+    document.getElementsByClassName('btnDn')[0].classList.add('col-xs-4','col-xs-offset-4');
     document.getElementsByClassName('btnRight')[0].classList.remove('col-xs-6');
-    document.getElementsByClassName('btnRight')[0].classList.add('col-xs-4');
+    document.getElementsByClassName('btnRight')[0].classList.add('col-xs-4','col-xs-offset-4');
   }
   else if(gd.windowHorizontal){
     // main layout
     document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
-    document.getElementsByClassName('canvasDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('canvasDiv')[0].classList.add('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
+    document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
+    document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
     document.getElementsByClassName('controlsDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('controlsDiv')[0].classList.add('col-xs-3', 'col-sm-3', 'col-md-3', 'col-lg-3');
     // buttons
     document.getElementsByClassName('btnUp')[0].classList.remove('col-xs-offset-4', 'col-xs-4');
-    document.getElementsByClassName('btnUp')[0].classList.add('col-xs-6', 'col-xs-offset-0')
-    document.getElementsByClassName('btnSpacer')[0].classList.add('hidden-xs', 'hidden-sm', 'hidden-md', 'hidden-lg');
+    document.getElementsByClassName('btnUp')[0].classList.add('col-xs-6', 'col-xs-offset-3');
+    //document.getElementsByClassName('btnSpacer')[0].classList.add('hidden-xs', 'hidden-sm', 'hidden-md', 'hidden-lg');
     //document.getElementsByClassName('btnSpacer')[0].classList.add('col-xs-offset-4' 'col-xs-4');
     document.getElementsByClassName('btnLeft')[0].classList.remove('col-xs-4');
     document.getElementsByClassName('btnLeft')[0].classList.add('col-xs-6');
-    document.getElementsByClassName('btnDn')[0].classList.remove('col-xs-4');
-    document.getElementsByClassName('btnDn')[0].classList.add('col-xs-6');
-    document.getElementsByClassName('btnRight')[0].classList.remove('col-xs-4');
+    document.getElementsByClassName('btnDn')[0].classList.remove('col-xs-4','col-xs-offset-4');
+    document.getElementsByClassName('btnDn')[0].classList.add('col-xs-6','col-xs-offset-3');
+    document.getElementsByClassName('btnRight')[0].classList.remove('col-xs-4','col-xs-offset-4');
     document.getElementsByClassName('btnRight')[0].classList.add('col-xs-6');
         
     
@@ -509,7 +552,40 @@ gd.setupGrid = function(){
   
     
     
-};
+}; // END OF updateHTML = function();
+
+gd.renderTiles = function(ctx,canvas) {
+  var rowImages = [
+        'images/water-block.png',   // Top row is water
+        'images/stone-block.png',   // Main play field is in rock
+        // 'images/Spanish_bond.svg',
+        'images/grass-block.png'    // 2 bottom rows are grass
+    ],
+    row, col;
+
+  /* Loop through the number of rows and columns we've defined above
+   * and, using the rowImages array, draw the correct image for that
+   * portion of the "grid"
+   */
+  for (row = 0; row < gd.numRows; row++) {
+    var rowImg;
+    if (row == 0){rowImg = Resources.get(rowImages[0]);}
+    else if ((row>0)&&(row<(gd.numRows-1))){rowImg = Resources.get(rowImages[1])}
+    else {rowImg = Resources.get(rowImages[2]);};
+   
+      for (col = 0; col < gd.numCols; col++) {
+          /* The drawImage function of the canvas' context element
+           * requires 3 parameters: the image to draw, the x coordinate
+           * to start drawing and the y coordinate to start drawing.
+           * We're using our Resources helpers to refer to our images
+           * so that we get the benefits of caching these images, since
+           * we're using them over and over.
+           */
+          ctx.drawImage(rowImg, col * gd.cellWidth, row * gd.cellHeight - gd.cellHeight/2,50,80);
+          
+      }
+  };
+}; // END OF renderTiles = function()
 
 /*
 *
@@ -525,15 +601,16 @@ gd.positionHoverDiv = function(){
   var divLeft = 0;
   var hoveringHTML = {};
   var canvasHTML = {};
-//  hoveringHTML = document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0].getBoundingClientRect();
-  hoveringHTML = document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0];  
-  canvasHTML = document.getElementsByClassName('canvasDiv')[0].getBoundingClientRect();
+//  hoveringHTML = document.getElementsByClassName('html-atop-canvas')[0].getBoundingClientRect();
+  hoveringHTML = document.getElementsByClassName('html-atop-canvas')[0];  
+  canvasHTML = document.getElementsByClassName('canvas-div')[0].getBoundingClientRect();
   divTop = canvasHTML.top;
   divLeft = canvasHTML.left;
   hoveringHTML.style.top = divTop+"px"; 
-  // document.getElementsByClassName('aboveCanvasHoveringHTMLDiv')[0].top = divTop;
+  // document.getElementsByClassName('html-atop-canvas')[0].top = divTop;
   hoveringHTML.style.left = divLeft+"px";
-};
+  
+}; // END OF positionHoverDiv = funciton()
 
 
 
@@ -578,15 +655,18 @@ gd.gameMenuModal1 = '<div class="gameMenuModal1"></div>';
 document.getElementsByClassName('btnMenu')[0].onclick = function(){
         
         //document.getElementsByClassName('gameMenuModal1')[0].modal('show');
-        if(!gd.paused){
-          gd.pause();
-        } else {
-          
+        if(!gd.paused) { gd.pause();
+        } else {  
         };
         $('.gameMenuModal1').modal('show');
 };
 
 gd.health = 50;
+
+document.getElementsByClassName('btnPlayerSprite')[0].onclick = function(){
+   $('.user-modal-player-sprite').modal('show');
+};
+
 
 
 
@@ -610,7 +690,7 @@ gd.landscape.stones = {}; // properties and settings for stones
 gd.landscape.stones.numStones = 0;
 gd.landscape.stones.Enabled = true;
 
-gd.landscape.stones.calcNumStones = function(){
+gd.landscape.stones.calcNumStones = function() {
   var stoneZoneArea = 4;//build 0 to 2 stones max per each 8 
   var numStoneZones = (gd.numCols*gd.numRows -
    (gd.numRows*gd.numCols % stoneZoneArea)) / stoneZoneArea;
@@ -636,28 +716,30 @@ gd.landscape.LandscapeObject = function(sprite, type, kind, ID){
   this.sprite = sprite;
   this.type = type;
   this.kind = kind;
-  this.leftNeighbour = 'free';
-  this.rightNeighbour = 'free';
-  this.belowNeighbour = 'free';
-  this.topNeighbour = 'free';
   this.leftNeighbourArr = [];
   this.rightNeighbourArr = [];
   this.topNeighbourArr = [];
   this.belowNeighbourArr = [];
   this.collidees = [];
   this.ID = ID;
+  
   var obj1 = {};
   obj1.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols-2)+2*gd.cellWidth;
   obj1.y = 0;
-  function checkY(obj){
+
+  // find x, check for collisions, do not put on 
+  // water and to not put on grass
+  
+  function checkY(obj) {
     obj.y = gd.cellHeight * gd.getRandomInt(0,gd.numRows)+gd.cellHeight*0.25;
-    if((obj.y>(gd.numRows-3)*gd.cellHeight)||(obj1.y < gd.cellHeight)){
+    if((obj.y>(gd.numRows-3)*gd.cellHeight)||(obj1.y < gd.cellHeight)) {
       obj = checkY(obj);
       return obj;
-    } else{
+    } else {
       return obj;
     };
   };
+  
   obj1 = checkY(obj1);
   obj1.collidees = [];
   obj1.leftNeighbourArr = [];
@@ -666,29 +748,32 @@ gd.landscape.LandscapeObject = function(sprite, type, kind, ID){
   obj1.belowNeighbourArr = [];
   
   function checkCollision(obj){
-    for(var i = 0;i<gd.allGameObjects.length;i++){
-      if(gd.allGameObjects[i]!='free'){
-        if(gd.allGameObjects[i].kind=='stone'){
-          gd.checkCollisions(obj,gd.allGameObjects[i]);
-        }
+    for (var i = 0;i<gd.allGameObjects.length;i++) {
+      if ((gd.allGameObjects[i]!='free')&&
+          (gd.allGameObjects[i].kind=='stone')) {
+        gd.checkCollisions(obj,gd.allGameObjects[i]);
       };
     };
-    if(obj.collidees.length>0){
+    
+    if (obj.collidees.length>0) {
       obj.collidees = [];
-      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols-1)+gd.cellWidth;
+      obj.x = gd.cellWidth * gd.getRandomInt(0,gd.numCols-2)+2*gd.cellWidth;
       obj = checkCollision(obj);
       return obj;
-    } else{
+    } else {
       return obj;
     };
+    
   };
+  
   obj1 = checkCollision(obj1);
   
-  // find x, check for collisions, do not put on 
-  // water and to not put on grass
   this.y = obj1.y;
   this.x = obj1.x;
-};
+
+}; // END OF LandscapeObject = function()
+
+
 gd.landscape.LandscapeObject.prototype.constructor = gd.landscape.LandscapeObject;
 
 gd.landscape.LandscapeObject.prototype.render = function(){
@@ -701,6 +786,11 @@ gd.landscape.LandscapeObject.prototype.move = function(){
 };
 
 gd.landscape.build = function(sprite){
+  for (var i = 101;i<200;i++) {
+    if ((gd.allGameObjects[i]!='free')&&(gd.allGameObjects[i].kind == 'stone')) {
+      gd.allGameObjects[i] = 'free';
+    };
+  };
   gd.landscape.stones.numStones = gd.landscape.stones.calcNumStones();
   for(var i = 101;i<gd.landscape.stones.numStones+101;i++){
     gd.allGameObjects[i] = new gd.landscape.LandscapeObject('images/Rock.png','blocked','stone',i);
@@ -766,16 +856,28 @@ gd.MovingObject.prototype.move = function(dt){
   if(this.direction == 'up'){this.y = this.y - incr;};  
   if(this.direction == 'stay'){this.x = this.x; this.y = this.y;};
  
-  /*
-  if(this.direction == 'right'){this.x = this.x + dt*this.speed*gd.movementFrozen;};
-  if(this.direction == 'left'){this.x = this.x - dt*this.speed*gd.movementFrozen;};
-  if(this.direction == 'down'){this.y = this.y + dt*this.speed*gd.movementFrozen;};
-  if(this.direction == 'up'){this.y = this.y - dt*this.speed*gd.movementFrozen;};  
-  if(this.direction == 'stay'){this.x = this.x; this.y = this.y;};
-  */
+
 };
 
-
+gd.notBlockedNoEnemy1 = function(arr){
+  var types = '';
+  for(var i = 0;i<arr.length;i++){
+    types += gd.allGameObjects[arr[i]].type;    
+  };
+  if((types.search('blocked')==-1)&&(types.search('enemy')==-1)){
+    return true;
+  } else return false;
+};
+  
+gd.blockedOrEnemy1 = function(arr){
+  var types = '';
+  for(var i = 0;i<arr.length;i++){
+    types += gd.allGameObjects[arr[i]].type;    
+  };
+  if((types.search('blocked')!=-1)||(types.search('enemy')!=-1)){
+    return true;
+  } else return false;
+};
 
 
 
@@ -827,51 +929,7 @@ gd.Enemy.prototype.dying = function(){
 gd.Enemy.prototype.cannotDoIt = function(){
   
 };
-/*
-gd.Enemy.prototype.moveLeft = function(){
-var obstacleAtLeft = false;
-obstacleAtLeft = !(gd.checkCollisions(gd.landscape.objects,this).search('atright')== -1);
-if((this.x > 0)&&(!obstacleAtLeft)){
-this.x = this.x-gd.cellWidth*gd.movementFrozen;
-}
-else {this.cannotDoIt();};
 
-};
-
-gd.Enemy.prototype.moveRight = function(){
-var obstacleAtRight = false;
-obstacleAtRight = !(gd.checkCollisions(gd.landscape.objects,this).search('atleft') == -1);
-var notBeyondRightBorder = false;
-notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
-if(!obstacleAtRight && notBeyondRightBorder){
-this.x = this.x + gd.cellWidth*gd.movementFrozen;
-} else{
-this.cannotDoIt();
-};
-};
-
-gd.Enemy.prototype.moveUp = function(){
-var obstacleAtop = false;
-obstacleAtop = !(gd.checkCollisions(gd.landscape.objects,this).search('below') == -1);
-if((this.y>0)&&(!obstacleAtop)){
-this.y = this.y - gd.cellHeight*gd.movementFrozen;
-} else {
-this.cannotDoIt();
-};
-};
-
-gd.Enemy.prototype.moveDown = function(){
-var notBeyondBottomBorder = false;
-notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
-var obstacleBelow = false;
-obstacleBelow = !(gd.checkCollisions(gd.landscape.objects,this).search('atop') == -1);
-if(notBeyondBottomBorder&&!obstacleBelow){
-this.y = this.y + gd.cellHeight*gd.movementFrozen;
-}else{
-this.cannotDoIt();
-};
-};
-*/
 /*
 *
 *
@@ -886,7 +944,7 @@ gd.Enemy.prototype.eraser = function(){
   if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
     gd.allGameObjects[this.ID] = 'free';
   };
-  if(this.y > ((document.getElementsByTagName("CANVAS")[0].height) + gd.cellHeight)) {
+  if(this.y > ((document.getElementsByTagName("CANVAS")[0].height) - 2*gd.cellHeight)) {
     gd.allGameObjects[this.ID] = 'free';
   };
   if(this.x < (0 - 6*gd.cellWidth)) {
@@ -895,11 +953,13 @@ gd.Enemy.prototype.eraser = function(){
   if(this.y < (-gd.cellHeight*0.5)) {
     gd.allGameObjects[this.ID] = 'free';
   };
+  if(this.leftattempts > 30){
+    gd.allGameObjects[this.ID] = 'free';
+  };
 };
 
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+// @param: dt, a time delta between ticks
 gd.Enemy.prototype.update = function(dt){
   // You should multiply any movement by the dt parameter
   // which will ensure the game runs at the same speed for
@@ -934,12 +994,10 @@ gd.Enemy.prototype.render = function() {
 */
 gd.EnemySoldier = function(x,y,sprite,ID,direction,type){
   this.nativeRow = -100;
-  this.dodgingY = 0;
-  this.dodgingX = 0;
   this.dodging = 0;
-  this.returning = 0;
   this.leftback = 0;
   this.rightStep = 0;
+  this.leftattempts = 0;
   gd.Enemy.call(this,x,y,sprite,ID,direction,type);
 };
 gd.EnemySoldier.prototype = Object.create(gd.Enemy.prototype);
@@ -995,10 +1053,10 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     } else return false;
   };
   
-  rightFree = notBlockedNoEnemy1(this.rightNeighbourArr);
-  leftFree = notBlockedNoEnemy1(this.leftNeighbourArr);
-  topFree = notBlockedNoEnemy1(this.topNeighbourArr);
-  belowFree = notBlockedNoEnemy1(this.belowNeighbourArr);
+  rightFree = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
+  leftFree = gd.notBlockedNoEnemy1(this.leftNeighbourArr);
+  topFree = gd.notBlockedNoEnemy1(this.topNeighbourArr);
+  belowFree = gd.notBlockedNoEnemy1(this.belowNeighbourArr);
   
   // local shortnamed variables to designate direction;
   var up = false;
@@ -1016,34 +1074,32 @@ gd.EnemySoldier.prototype.defineDirection = function(){
   if(this.direction == 'right'){up = false;down = false;stay = false;right = true;left = false;};
   if(this.direction == 'left'){up = false;down = false;stay = false;right = false;left = true;};  
 
-  if(this.y > this.nativeRow*1.1){belowNative = true;};
-  if(this.y < this.nativeRow*0.9){aboveNative = true;};
+  if(this.y > this.nativeRow*1.05){belowNative = true;};
+  if(this.y < this.nativeRow*0.95){aboveNative = true;};
   
   // local shortnamed variable to designate dodging;
   var dodging = false;
-  var returning = false;
   var steppedLeft = false;
   var steppedRight = false;
   
   if(this.dodging>0){ dodging = true;} else { dodging = false;};
-  if(this.returning>0){ returning = true;} else { returning = false;};
   
-  if((this.leftback-this.x)>gd.cellWidth){steppedLeft = true;}
+  if((this.leftback-this.x)>(0.3*gd.cellWidth)){steppedLeft = true;}
   else {steppedLeft = false;};
   
   if((this.x - this.rightStep)>(0.3*gd.cellWidth)&&(this.rightStep!=0)){
     steppedRight = true;
   };
   
-  /* if(dodging&&(!returning)){
+  /* if(dodging){
     
   } else if(returning&&(!dodging)){
     
-  } else if((!dodging)&&(!returning){
+  } else if((!dodging){
     
   };*/
   
-  if((right)&&(!rightFree)&&(!dodging)&&(!returning)){
+  if((right)&&(!rightFree)&&(!dodging)){
     if((topFree)&&(belowFree)){
       if(upOrDown){this.direction = 'up';};
       if(!upOrDown){this.direction = 'down';};
@@ -1058,28 +1114,26 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     this.direction = 'right';
     //if(steppedRight){this.rightStep = this.x;};
     if(this.rightStep==0){this.rightStep = this.x};
-  } else if(dodging&&left&&steppedLeft&&topFree&&belowFree&&(!returning)){
+  } else if(dodging&&left&&steppedLeft&&topFree&&belowFree){
       if(upOrDown){this.direction = 'up';};
       if(!upOrDown){this.direction = 'down';};
       this.dodging++;
       this.leftback = 0;
-  } else if(dodging&&left&&steppedLeft&&topFree&&(!returning)){
+  } else if(dodging&&left&&steppedLeft&&topFree){
     this.direction = 'up';
     this.dodging++;
     this.leftback = 0;
-  } else if(dodging&&left&&steppedLeft&&belowFree&&(!returning)){
+  } else if(dodging&&left&&steppedLeft&&belowFree){
     this.direction = 'down';
     this.dodging++;
     this.leftback = 0;
   } else if(dodging&&(up||down)&&rightFree){
     this.direction = 'right';
     this.dodging = 0;
-    //if(this.rightStep==0){this.rightStep = this.x};
-    //if(steppedRight){this.rightStep = this.x;};
-  } else if(dodging&&up&&(!topFree)&&(!returning)){
+  } else if(dodging&&up&&(!topFree)){
     this.direction = 'left';
     this.leftback = this.x;
-  } else if(dodging&&down&&(!belowFree)&&(!returning)){
+  } else if(dodging&&down&&(!belowFree)){
     this.direction = 'left';
     this.leftback = this.x;
     
@@ -1093,33 +1147,12 @@ gd.EnemySoldier.prototype.defineDirection = function(){
   if(((!belowNative)&&(!aboveNative))||dodging){
     this.rightStep = 0;
   };
-  
-//  TO ADD DODGING2 - FOR RETURNING TO NATIVE? or just dodging the obstacles or resetting?
-  
-
-  
-  if(gd.debugKey1){
-    console.log(this.direction);
-    console.log(this.topNeighbourArr);
-    console.log(this.belowNeighbourArr);
-    console.log(this.rightNeighbourArr);
-  };
-  this.leftNeighbour = 'free';
-  this.rightNeighbour = 'free';
-  this.topNeighbour = 'free';
-  this.belowNeighbour = 'free';
-  this.rightNeighbourArr = [];
-  this.leftNeighbourArr = [];
-  this.topNeighbourArr = [];
-  this.belowNeighbourArr = [];
+  if(left){this.leftattempts++;};
 }; 
 
-
-
-/*
-//   END OF   defineDirection function
-*
-*    
+/**
+* 
+* END OF   defineDirection function   
 *
 */
 
@@ -1158,9 +1191,9 @@ i = 1;
 gd.swarmEnemies = function(){
   
   
-  for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
+  //for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
     
-    //  for(var i = 0,j=0, k=0;i<((gd.numRows-2)*2+gd.getRandomInt(0,8));i++){
+  for(var i = 0,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3));i++){
     j++;
     if(j>(gd.numRows-3)){j=0;};
     // j++;
@@ -1208,10 +1241,12 @@ gd.Player = function(sprite,ID){
   this.topNeighbour = 'free';
   this.belowNeighbour = 'free';
   this.type = 'player';
+  this.outOfBorders = false;
   gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
 gd.Player.prototype = Object.create(gd.MovingObject.prototype);
 gd.Player.prototype.constructor = gd.Player;
+
 
 gd.Player.prototype.update = function(dt){
   
@@ -1234,6 +1269,7 @@ gd.Player.prototype.dying = function(){
   this.returnToStart();
 };
  
+ 
 gd.Player.prototype.render = function(){
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
@@ -1241,43 +1277,44 @@ gd.Player.prototype.render = function(){
 
 
 gd.Player.prototype.moveLeft = function(){
-  var obstacleAtLeft = false;
-  obstacleAtLeft = !(gd.checkCollisions(gd.landscape.objects,this).search('atright')== -1);
-  if((this.x > 0)&&(!obstacleAtLeft)){
+  var noObstacleAtLeft = false;
+  noObstacleAtLeft = gd.notBlockedNoEnemy1(this.leftNeighbourArr);;
+  if( ((this.x - 0.9*gd.cellWidth)>0)&&noObstacleAtLeft){
       this.x = this.x-gd.cellWidth*gd.movementFrozen;
   }
   else {this.cannotDoIt();};
-
 };
 
 gd.Player.prototype.moveRight = function(){
-  var obstacleAtRight = false;
-  obstacleAtRight = !(gd.checkCollisions(gd.landscape.objects,this).search('atleft') == -1);
+  var noOstacleAtRight = false;
+  noObstacleAtRight = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
   var notBeyondRightBorder = false;
   notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
-  if(!obstacleAtRight && notBeyondRightBorder){
+  if(noObstacleAtRight&&notBeyondRightBorder){
     this.x = this.x + gd.cellWidth*gd.movementFrozen;
   } else{
     this.cannotDoIt();
   };
 };
 
-gd.Player.prototype.moveUp = function(){
-  var obstacleAtop = false;
-  obstacleAtop = !(gd.checkCollisions(gd.landscape.objects,this).search('below') == -1);
-  if((this.y>0)&&(!obstacleAtop)){
+gd.Player.prototype.moveUp = function() {
+  var noObstacleAtop = false;
+  noObstacleAtop = gd.notBlockedNoEnemy1(this.topNeighbourArr);
+  if(gd.debugKey1){console.log(this.topNeighbourArr);};
+  if(((this.y-0.1*gd.cellHeight)>0)&&noObstacleAtop) {
     this.y = this.y - gd.cellHeight*gd.movementFrozen;
   } else {
     this.cannotDoIt();
   };
 };
 
+
 gd.Player.prototype.moveDown = function(){
   var notBeyondBottomBorder = false;
   notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
-  var obstacleBelow = false;
-  obstacleBelow = !(gd.checkCollisions(gd.landscape.objects,this).search('atop') == -1);
-  if(notBeyondBottomBorder&&!obstacleBelow){
+  var noObstacleBelow = false;
+  noObstacleBelow = gd.notBlockedNoEnemy1(this.belowNeighbourArr);
+  if(notBeyondBottomBorder&&noObstacleBelow){
     this.y = this.y + gd.cellHeight*gd.movementFrozen;
   }else{
     this.cannotDoIt();
@@ -1312,19 +1349,19 @@ gd.allGameObjects[0] = new gd.Player('images/char-boy.png',0);
 
 gd.updateHoveringItems = function(){
     // $('.healthScore').remove(".healthScoreSpan");
-    $('.healthScoreSpan').remove();
-    gd.allGameObjects[0].namePosition = document.getElementsByClassName('playerName')[0];
+    $('.health-bar-span').remove();
+    gd.allGameObjects[0].namePosition = document.getElementsByClassName('player-name')[0];
     gd.allGameObjects[0].namePosition.textContent = gd.allGameObjects[0].name;
-    $('.healthScore').append('<span class="healthScoreSpan">'+gd.allGameObjects[0].health+'<\/span>');
+    $('.health-bar').append('<span class="health-bar-span">'+gd.allGameObjects[0].health+'<\/span>');
 
 };
 
 gd.positionHoveringItems = function(){
-    var namePosition = document.getElementsByClassName('playerName')[0];
+    var namePosition = document.getElementsByClassName('player-name')[0];
     namePosition.style.left = "200px";
     namePosition.style.top = gd.cellHeight+"px";
     
-    var healthScorePosition = document.getElementsByClassName('healthScore')[0];
+    var healthScorePosition = document.getElementsByClassName('health-bar')[0];
     healthScorePosition.style.left = (gd.numCols*gd.cellWidth - gd.cellWidth/2 - healthScorePosition.getBoundingClientRect().width)+"px"; 
     healthScorePosition.style.top = gd.cellHeight+"px";
     //gd.player.namePosition = document.getElementsByClassName('playerName')[0];
@@ -1335,67 +1372,44 @@ gd.positionHoveringItems = function(){
 
 
 
-gd.updateAttackers = function(){
+gd.updateAttackers = function() {
+  var i = 0;
+  
+  for(i=0;i<gd.allGameObjects.length;i++) {
+    // @description improve code readabilty with help extra vars
+    // @note remember that there is only one player in this release
+    // @note this player is gd.allGameObjects[0]
     
-    // FIND WHO IS ATTACKING IN THIS CYCLE/FRAME
-    var collisions = gd.checkCollisions(gd.allGameObjects,gd.allGameObjects[0]); //gd.allGameObjects[0] to [9] - players
-    var collisionsArr = [-200];
-    var searchResult = '';
-    var enemyEntry = '';
-    var sliceStart = 0;
-    var sliceEnd = 0;
-    var i = 0;
+    var enemy = {};
+    var colliding = false;
+    enemy = gd.allGameObjects[i];
     
-    // if(gd.debugKey1){ console.log(collisions.match('collisionID'));};
-    
-    while(i != 1){
-      if(collisions.search('collisionID') != -1){
-        sliceStart = collisions.search('collisionID')+11;
-        sliceEnd = collisions.slice(sliceStart).search(';');
-        searchResult = collisions.slice(sliceStart,sliceStart+sliceEnd);
-        searchResult = Number(searchResult);
-        collisionsArr.push(searchResult);
-        collisions = collisions.slice(sliceStart+sliceEnd);
-      } else {
-        i = 1;
+    if((enemy != 'free')&&(enemy.type=='enemy')) { 
+      colliding = gd.allGameObjects[0].collidees.indexOf(enemy.ID)!=-1;
+       
+      // @description if an enemy was not attacking and is colliding in this
+      // @description cycle/frame, then tag him 'attacking' and add 1 hit in this cycle
+      if(!enemy.attacking&&colliding) {
+        enemy.attacking = true;
+        gd.hitsInThisCycle = gd.hitsInThisCycle + 1;
+      }
+      // if an enemy was attacking in the previous cycle and is still
+      // attacking now and is still colliding, then do nothing
+      else if(enemy.attacking&&colliding) {
+        // @description do nothing
+      }
+      // if an enemy was colliding and attacking in the previous 
+      // cycle but not colliding now, and, consequently, is not 
+      // colliding anymore, then reset its attacking state
+      else if(enemy.attacking&&!colliding){
+        enemy.attacking = false;
       };
-    };
-    /* end of while loop */
-    
-    for(i=0;i<gd.allGameObjects.length;i++){
-      if((gd.allGameObjects[i] != 'free')&&(gd.allGameObjects[i].type=='enemy')){
-        
-        // if an enemy was not attacking and is colliding in this
-        // cycle/frame, then tag him 'attacking' and add 1 hit in this cycle
-        if((gd.allGameObjects[i].attacking==false)&&(collisionsArr.indexOf(gd.allGameObjects[i].ID)!=-1)){
-          
-          gd.allGameObjects[i].attacking = true;
-          gd.hitsInThisCycle = gd.hitsInThisCycle + 1;
-          // console.log('new attack found: '+gd.hitsInThisCycle);
-        }
-        // if an enemy was attacking in the previous cycle and is still
-        // attacking now and is still colliding, then do nothing
-        else if((gd.allGameObjects[i].attacking == true)&&(collisionsArr.indexOf(gd.allGameObjects[i].ID)!=-1)){
-          // console.log('still attacking, no change'+gd.allGameObjects[i].ID);
-        }
-        // if an enemy was colliding and attacking in the previous 
-        // cycle but not colliding now, and, consequently, is not 
-        // colliding anymore, then reset its attacking state
-        else if((gd.allGameObjects[i].attacking==true)&&(collisionsArr.indexOf(gd.allGameObjects[i].ID)==-1)){
-          // console.log(gd.allGameObjects[i].ID+'resets');
-          gd.allGameObjects[i].attacking = false;
-        };
-      };
-      
-    }; 
-    
-      // searchResult = collisions.search('collision');
-      // semicolon = collisions.slice(searchResult).search(';');
-      // enemyEntry = collisions.slice(searchResult+9,semicolon);
-      // console.log(enemyEntry); 
-      // searchResult = -1;
-    
-};
+
+    }; // end of if enemy is enemy
+  };  // end of for loop
+}; // END OF updateAttackers = function()
+
+
 
 
 
@@ -1455,260 +1469,197 @@ document.getElementsByClassName('btnPause')[0].onclick = function(){
  */
 
 var Engine = (function(global) {
-    /* Predefine the variables we'll be using within this scope,
-     * create the canvas element, grab the 2D context for that canvas
-     * set the canvas elements height/width and add it to the DOM.
-     */
-    var doc = global.document,
-        win = global.window,
-        canvas = doc.createElement('canvas'),
-        ctx = canvas.getContext('2d'),
-        lastTime;
-    // user defined functions
-    
-    canvas.classList.add('canvasStoneField');
-    canvas.classList.add('center-block');
-    
-    canvas.width = gd.numCols*gd.cellWidth;
-    canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
-    doc.getElementsByClassName("canvasDiv")[0].appendChild(canvas);
-   
-    // gd.landscape.stonny = new gd.landscape.LandscapeObject('images/Rock.png','stone');
-
-    /* This function serves as the kickoff point for the game loop itself
-     * and handles properly calling the update and render methods.
-     */
-    /* 
-    function loopPause(){
-      if(gd.paused){
-        loopPause();
-      }
-      else{
-       win.requestAnimationFrame(main);
-      };
-    };
-    */
-    function main() {
-        /* Get our time delta information which is required if your game
-         * requires smooth animation. Because everyone's computer processes
-         * instructions at different speeds we need a constant value that
-         * would be the same for everyone (regardless of how fast their
-         * computer is) - hurray time!
-         */      
-        var now = Date.now(), dt = (now - lastTime) / 1000.0;
-
-        /* Call our update/render functions, pass along the time delta to
-         * our update function since it may be used for smooth animation.
-         */
-        
-        update(dt);
-        render(dt);
-
-        /* Set our lastTime variable which is used to determine the time delta
-         * for the next time this function is called.
-         */
-        lastTime = now;
-
-        /* Use the browser's requestAnimationFrame function to call this
-         * function again as soon as the browser is able to draw another frame.
-         */
-
-       win.requestAnimationFrame(main);
-    }; // main()
-
-    /* This function does some initial setup that should only occur once,
-     * particularly setting the lastTime variable that is required for the
-     * game loop.
-     */
-    function init() {
-        reset();
-        lastTime = Date.now();
-        main();
-        gd.allGameObjects[0].returnToStart();
-        gd.landscape.build();
-        document.getElementsByClassName('infoPanel')[0].textContent = "Game is running.";
-            
-    }
-
-    /* This function is called by main (our game loop) and itself calls all
-     * of the functions which may need to update entity's data. Based on how
-     * you implement your collision detection (when two entities occupy the
-     * same space, for instance when your character should die), you may find
-     * the need to add an additional function call here. For now, we've left
-     * it commented out - you may or may not want to implement this
-     * functionality this way (you could just implement collision detection
-     * on the entities themselves within your app.js file).
-     */
-    function update(dt) {
-       
-        updateEntities(dt);
-        // gd.updateAttackers();
-        
-        // gd.allGameObjects[0].getAttacked();
+  /* Predefine the variables we'll be using within this scope,
+   * create the canvas element, grab the 2D context for that canvas
+   * set the canvas elements height/width and add it to the DOM.
+   */
+  var doc = global.document,
+      win = global.window,
+      canvas = doc.createElement('canvas'),
+      ctx = canvas.getContext('2d'),
+      lastTime;
+  // user defined functions
+  
+  canvas.classList.add('canvasStoneField');
+  canvas.classList.add('center-block');
+  
+  canvas.width = gd.numCols*gd.cellWidth;
+  canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
+  doc.getElementsByClassName("canvas-div")[0].appendChild(canvas);
  
-    };
+  // gd.landscape.stonny = new gd.landscape.LandscapeObject('images/Rock.png','stone');
 
-    /* This is called by the update function and loops through all of the
-     * objects within your allEnemies array as defined in app.js and calls
-     * their update() methods. It will then call the update function for your
-     * player object. These update methods should focus purely on updating
-     * the data/properties related to the object. Do your drawing in your
-     * render methods.
-     */
-    function updateEntities(dt) {
-        /* gd.allGameObjects.forEach(function(enemy) {
-          if((enemy != 'free')&&(enemy.type=='enemy')){
-            enemy.update(dt);
-          }
-        });
-        */
-        gd.swarmEnemies();
-        /*
-        for(var i = 0;i<gd.allGameObjects.length;i++){
-          if(gd.allGameObjects[i].type == 'enemy'){
-            gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects); 
-          };
-        };
-        */
-        for(var i = 0;i<gd.allGameObjects.length;i++){
-          if(gd.allGameObjects[i] != 'free'){
-            gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects); 
-          };
-        };
-        for(var i = 0;i<gd.allGameObjects.length;i++){
-          if(gd.allGameObjects[i].type == 'enemy'){
-            gd.allGameObjects[i].defineDirection();
-            gd.allGameObjects[i].update(dt);  
-          };
-        };
-        for(var i = 0;i<gd.allGameObjects.length;i++){
-          if(gd.allGameObjects[i].type == 'enemy'){
-            // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
-            gd.allGameObjects[i].eraser();  
-          };
-        };
-        gd.allGameObjects[0].update(dt);
-        
-    };
-
-    /* This function initially draws the "game level", it will then call
-     * the renderEntities function. Remember, this function is called every
-     * game tick (or loop of the game engine) because that's how games work -
-     * they are flipbooks creating the illusion of animation but in reality
-     * they are just drawing the entire screen over and over.
-     */
-    function render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-       // var experimentImg = gd.draw(ctx);
-       gd.setupGrid();
-       
-       gd.positionHoverDiv();
-       gd.updateHoveringItems();
-       gd.positionHoveringItems();
-       
-       canvas.width = gd.numCols*gd.cellWidth;
-       canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
-        var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Main play field is in rock
-                // 'images/Spanish_bond.svg',
-                'images/grass-block.png'    // 2 bottom rows are grass
-            ],
-            row, col;
-
-        /* Loop through the number of rows and columns we've defined above
-         * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
-         */
-        for (row = 0; row < gd.numRows; row++) {
-          var rowImg;
-          if (row == 0){rowImg = Resources.get(rowImages[0]);}
-          else if ((row>0)&&(row<(gd.numRows-1))){rowImg = Resources.get(rowImages[1])}
-          else {rowImg = Resources.get(rowImages[2]);};
-         
-            for (col = 0; col < gd.numCols; col++) {
-                /* The drawImage function of the canvas' context element
-                 * requires 3 parameters: the image to draw, the x coordinate
-                 * to start drawing and the y coordinate to start drawing.
-                 * We're using our Resources helpers to refer to our images
-                 * so that we get the benefits of caching these images, since
-                 * we're using them over and over.
-                 */
-                
-                
-                ctx.drawImage(rowImg, col * gd.cellWidth, row * gd.cellHeight - gd.cellHeight/2,50,80);
-                
-            }
-        }
-        // gd.landscape.stonny.render();
-        gd.landscape.renderAll();
-        renderEntities();
-        //for(var i = 0;i<gd.allGameObjects.length;i++){
-        //  gd.resetPosRelations(gd.allGameObjects[i]);
-        //};
-        document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').left = ctx.x;
-        document.getElementsByClassName('aboveCanvasHoveringHTMLDiv').top = document.getElementsByTagName("CANVAS")[0].y;
+  /* This function serves as the kickoff point for the game loop itself
+   * and handles properly calling the update and render methods.
+   */
+  /* 
+  function loopPause(){
+    if(gd.paused){
+      loopPause();
     }
+    else{
+     win.requestAnimationFrame(main);
+    };
+  };
+  */
+  function main() {
+      /* Get our time delta information which is required if your game
+       * requires smooth animation. Because everyone's computer processes
+       * instructions at different speeds we need a constant value that
+       * would be the same for everyone (regardless of how fast their
+       * computer is) - hurray time!
+       */      
+      var now = Date.now(), dt = (now - lastTime) / 1000.0;
+      /* Call our update/render functions, pass along the time delta to
+       * our update function since it may be used for smooth animation.
+       */
+      update(dt);
+      render(dt);
+      /* Set our lastTime variable which is used to determine the time delta
+       * for the next time this function is called.
+       */
+      lastTime = now;
+      /* Use the browser's requestAnimationFrame function to call this
+       * function again as soon as the browser is able to draw another frame.
+       */
+     win.requestAnimationFrame(main);
+  }; // main()
 
-    /* This function is called by the render function and is called on each game
-     * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
-     */
-    function renderEntities() {
-        /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
-         */
-          
-       //gd.swarmEnemies();
+  /* This function does some initial setup that should only occur once,
+   * particularly setting the lastTime variable that is required for the
+   * game loop.
+   */
+  function init() {
+      reset();
+      lastTime = Date.now();
+      main();
+      gd.allGameObjects[0].returnToStart();
+      gd.landscape.build();
+      document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";      
+  };
+
+  /* This function is called by main (our game loop) and itself calls all
+   * of the functions which may need to update entity's data. Based on how
+   * you implement your collision detection (when two entities occupy the
+   * same space, for instance when your character should die), you may find
+   * the need to add an additional function call here. For now, we've left
+   * it commented out - you may or may not want to implement this
+   * functionality this way (you could just implement collision detection
+   * on the entities themselves within your app.js file).
+   */
+  function update(dt) {
+     
+      updateEntities(dt);
       
-       
-      for(var i=0;i<gd.allGameObjects.length;i++){
-        if(gd.allGameObjects[i].type=='enemy'){
-          gd.allGameObjects[i].render(); 
-        };
+      
+      gd.allGameObjects[0].getAttacked();
+
+  };
+
+  /* This is called by the update function and loops through all of the
+   * objects within your allEnemies array as defined in app.js and calls
+   * their update() methods. It will then call the update function for your
+   * player object. These update methods should focus purely on updating
+   * the data/properties related to the object. Do your drawing in your
+   * render methods.
+   */
+  function updateEntities(dt) {
+    gd.swarmEnemies(); // generate new enemies if there is enough space on the screen
+    gd.resetPosRelationsOfAll(); // reset/empty the arrays mentioned on the following below comment
+    gd.findCurrentPositions(); // each object has 5 arrays holding IDs of other obects located to left/right/up/down/collide - update those
+    
+    
+    for(var i = 0;i<gd.allGameObjects.length;i++){
+      if(gd.allGameObjects[i].type == 'enemy'){
+        gd.allGameObjects[i].defineDirection();
+        gd.allGameObjects[i].update(dt);  
       };
-            /*
-        gd.allGameObjects.forEach(function(enemy) {
-            if((enemy != 'free')&&(enemy.type=='enemy')){
-              enemy.render();
-            };
-        });
-        */
-        gd.allGameObjects[0].render();
-          //gd.swarmEnemies();
-    }
+    };
+    for(var i = 0;i<gd.allGameObjects.length;i++){
+      if(gd.allGameObjects[i].type == 'enemy'){
+        // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
+        gd.allGameObjects[i].eraser();  
+      };
+    };
+    gd.updateAttackers(); // update attacking/notattacking state of each enemy
+    gd.allGameObjects[0].update(dt); // update Player 
+      
+  }; // END OF function updateEntities()
+  
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
-    function reset() {
-        // noop
-    }
+  /* This function initially draws the "game level", it will then call
+   * the renderEntities function. Remember, this function is called every
+   * game tick (or loop of the game engine) because that's how games work -
+   * they are flipbooks creating the illusion of animation but in reality
+   * they are just drawing the entire screen over and over.
+   */
+  function render() {
+    gd.calculateGrid(ctx,canvas);
+    if (gd.layoutChanged) {
+      gd.allGameObjects[0].returnToStart();
+      gd.landscape.build();
+      gd.layoutChanged = false;
+    };
+    gd.updateHTML();
+   
+    gd.positionHoverDiv();
+    gd.updateHoveringItems();
+    gd.positionHoveringItems();
+     
+    gd.renderTiles(ctx,canvas);
+    gd.landscape.renderAll();
+    renderEntities();
+    document.getElementsByClassName('html-atop-canvas')[0].left = ctx.x;
+    document.getElementsByClassName('html-atop-canvas')[0].top = document.getElementsByTagName("CANVAS")[0].y;
+    
+  }; // END OF function render()
 
-    /* Go ahead and load all of the images we know we're going to need to
-     * draw our game level. Then set init as the callback method, so that when
-     * all of these images are properly loaded our game will start.
-     */
-    Resources.load([
-        'images/stone-block.png',
-        'images/Spanish_bond.svg',
-        'images/water-block.png',
-        'images/grass-block.png',
-        'images/enemy-bug.png',
-        'images/char-boy.png',
-        'images/Rock.png'
-    ]);
-    Resources.onReady(init);
+  /* This function is called by the render function and is called on each game
+   * tick. Its purpose is to then call the render functions you have defined
+   * on your enemy and player entities within app.js
+   */
+  function renderEntities() {
 
-    /* Assign the canvas' context object to the global variable (the window
-     * object when run in a browser) so that developers can use it more easily
-     * from within their app.js files.
-     */
-    global.ctx = ctx;
-    gd.swarmEnemies();  
+    for(var i=0;i<gd.allGameObjects.length;i++){
+      if(gd.allGameObjects[i].type=='enemy'){
+        gd.allGameObjects[i].render(); 
+      };
+    };
+    
+    gd.allGameObjects[0].render();
+    
+  }; // END OF function renderEntities()
+  
+
+  /* This function does nothing but it could have been a good place to
+   * handle game reset states - maybe a new game menu or a game over screen
+   * those sorts of things. It's only called once by the init() method.
+   */
+  function reset() {
+      // noop
+  }
+
+  /* Go ahead and load all of the images we know we're going to need to
+   * draw our game level. Then set init as the callback method, so that when
+   * all of these images are properly loaded our game will start.
+   */
+  Resources.load([
+      'images/stone-block.png',
+      'images/Spanish_bond.svg',
+      'images/water-block.png',
+      'images/grass-block.png',
+      'images/enemy-bug.png',
+      'images/char-boy.png',
+      'images/Rock.png'
+  ]);
+  Resources.onReady(init);
+
+  /* Assign the canvas' context object to the global variable (the window
+   * object when run in a browser) so that developers can use it more easily
+   * from within their app.js files.
+   */
+  global.ctx = ctx;
+  gd.swarmEnemies();  
 })(this);
 
 
