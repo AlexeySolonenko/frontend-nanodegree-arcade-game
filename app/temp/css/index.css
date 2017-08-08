@@ -78,7 +78,7 @@ body {
 
 .canvas-div, .controlsDiv, .canvasContainer,
 .canvasStoneField, .screenHoriz, .screenVert,
- .userTest2, .health-bar-span, 
+ .userTest2, .health-bar-span
 {}
 
 
@@ -101,7 +101,17 @@ body {
 */
 
 .gameMenuModal1,
-.gameMenuModal1Label
+.gameMenuModal1Label,
+.game-menu-modal-body,
+.game-menu-home,
+.game-menu-player-sprite,
+.game-menu-player-sprite-btn,
+.game-menu-btn-continue,
+.game-menu-btn-rules,
+.game-menu-btn-options,
+.game-menu-options,
+.game-menu-btn-restart,
+.game-menu-btn-prev
 {}
 
 /*
