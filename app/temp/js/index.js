@@ -656,7 +656,25 @@ gd.gameMenuErase = function(dontSetPrev) {
 };
 
 
-gd.gameMenuButtonHTML = '<div class="col-xs-%% btn btn-default %class% center-block"><h3>%data%</h3></div>';
+gd.gameMenuTraceActivePlayerSprite = function(){
+  var el = '';
+  el = $('.game-menu-player-sprite .carousel-inner')[0];
+  var index = -1;
+  var bufIndex = 0;
+  var classList = [];
+  for(var i=0;i<el.childNodes.length;i++){
+    bufIndex = i;
+    classList = el.childNodes[i].classList;
+    for(var j = 0;j<classList.length;j++){
+      if(classList[j].search('active')!=-1){
+        index = bufIndex;
+      };
+    };
+  };
+  gd.playerActiveSprite = gd.playerAllSprites[index];
+};
+
+gd.gameMenuButtonHTML = '<div class="col-xs-%%"><button class="btn btn-block btn-default %class% "><h3>%data%</h3></button></div>';
 gd.gameMenuContent = [];
 gd.gameMenuContent[0] = {name:'CONTINUE',itemClass:'game-menu-btn-continue',type:'button',cols:6};
 gd.gameMenuContent[1] = {name:'RULES',itemClass:'game-menu-btn-rules',type:'button',cols:6};
@@ -703,7 +721,7 @@ $('.game-menu-btn-options').click(function(){
   $('.game-menu-options').show(500);
 });
 
-$('.game-menu-player-sprite-btn').click(function(){
+$('.game-menu-btn-player-sprite').click(function(){
   gd.gameMenuErase();
   $('.game-menu-player-sprite').show(500);
 });
@@ -716,6 +734,9 @@ $('.game-menu-btn-prev').click(function(){
   };
 });
 
+$('.carousel-player-sprite-btn-ctrl').click(function(){
+  gd.gameMenuTraceActivePlayerSprite();
+});
 
 /*
 document.getElementsByClassName('btnPlayerSprite')[0].onclick = function(){
@@ -1270,8 +1291,24 @@ gd.swarmEnemies = function(){
 
 
 
+/*
+*
+*
+* PLAYER AUX FUNCTIONS AND VARS
+*
+*
+*/
 
+gd.playerActiveSprite = '';
+gd.playerAllSprites = [
+  'images/char-boy.png',
+  'images/char-cat-girl.png',
+  'images/char-horn-girl.png',
+  'images/char-pink-girl.png',
+  'images/char-princess-girl.png'
+];
 
+gd.playerActiveSprite = gd.playerAllSprites[1];
 
 /*
 *
@@ -1287,7 +1324,7 @@ gd.swarmEnemies = function(){
 // This class requires an update(), render() and
 // a handleInput() method.
 gd.Player = function(sprite,ID){
-  this.sprite = 'images/char-boy.png';
+  this.sprite = gd.playerActiveSprite;
   this.returnToStart(); // defines 
   this.name = 'Player Prototype';
   this.namePosition = {};
@@ -1327,6 +1364,7 @@ gd.Player.prototype.dying = function(){
  
  
 gd.Player.prototype.render = function(){
+  gd.allGameObjects[0].sprite=gd.playerActiveSprite;
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
 
@@ -1397,7 +1435,7 @@ gd.Player.prototype.handleInput = function(key){
     
 };
 
-gd.allGameObjects[0] = new gd.Player('images/char-boy.png',0);
+gd.allGameObjects[0] = new gd.Player(gd.playerActiveSprite,0);
 
 
 
@@ -1706,7 +1744,11 @@ var Engine = (function(global) {
       'images/grass-block.png',
       'images/enemy-bug.png',
       'images/char-boy.png',
-      'images/Rock.png'
+      'images/Rock.png',
+      'images/char-cat-girl.png',
+      'images/char-horn-girl.png',
+      'images/char-pink-girl.png',
+      'images/char-princess-girl.png'
   ]);
   Resources.onReady(init);
 

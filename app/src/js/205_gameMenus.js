@@ -37,7 +37,25 @@ gd.gameMenuErase = function(dontSetPrev) {
 };
 
 
-gd.gameMenuButtonHTML = '<div class="col-xs-%% btn btn-default %class% center-block"><h3>%data%</h3></div>';
+gd.gameMenuTraceActivePlayerSprite = function(){
+  var el = '';
+  el = $('.game-menu-player-sprite .carousel-inner')[0];
+  var index = -1;
+  var bufIndex = 0;
+  var classList = [];
+  for(var i=0;i<el.childNodes.length;i++){
+    bufIndex = i;
+    classList = el.childNodes[i].classList;
+    for(var j = 0;j<classList.length;j++){
+      if(classList[j].search('active')!=-1){
+        index = bufIndex;
+      };
+    };
+  };
+  gd.playerActiveSprite = gd.playerAllSprites[index];
+};
+
+gd.gameMenuButtonHTML = '<div class="col-xs-%%"><button class="btn btn-block btn-default %class% "><h3>%data%</h3></button></div>';
 gd.gameMenuContent = [];
 gd.gameMenuContent[0] = {name:'CONTINUE',itemClass:'game-menu-btn-continue',type:'button',cols:6};
 gd.gameMenuContent[1] = {name:'RULES',itemClass:'game-menu-btn-rules',type:'button',cols:6};
@@ -84,7 +102,7 @@ $('.game-menu-btn-options').click(function(){
   $('.game-menu-options').show(500);
 });
 
-$('.game-menu-player-sprite-btn').click(function(){
+$('.game-menu-btn-player-sprite').click(function(){
   gd.gameMenuErase();
   $('.game-menu-player-sprite').show(500);
 });
@@ -97,6 +115,9 @@ $('.game-menu-btn-prev').click(function(){
   };
 });
 
+$('.carousel-player-sprite-btn-ctrl').click(function(){
+  gd.gameMenuTraceActivePlayerSprite();
+});
 
 /*
 document.getElementsByClassName('btnPlayerSprite')[0].onclick = function(){

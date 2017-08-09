@@ -1,7 +1,23 @@
 
 
+/*
+*
+*
+* PLAYER AUX FUNCTIONS AND VARS
+*
+*
+*/
 
+gd.playerActiveSprite = '';
+gd.playerAllSprites = [
+  'images/char-boy.png',
+  'images/char-cat-girl.png',
+  'images/char-horn-girl.png',
+  'images/char-pink-girl.png',
+  'images/char-princess-girl.png'
+];
 
+gd.playerActiveSprite = gd.playerAllSprites[1];
 
 /*
 *
@@ -17,7 +33,7 @@
 // This class requires an update(), render() and
 // a handleInput() method.
 gd.Player = function(sprite,ID){
-  this.sprite = 'images/char-boy.png';
+  this.sprite = gd.playerActiveSprite;
   this.returnToStart(); // defines 
   this.name = 'Player Prototype';
   this.namePosition = {};
@@ -57,6 +73,7 @@ gd.Player.prototype.dying = function(){
  
  
 gd.Player.prototype.render = function(){
+  gd.allGameObjects[0].sprite=gd.playerActiveSprite;
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
 
@@ -127,4 +144,4 @@ gd.Player.prototype.handleInput = function(key){
     
 };
 
-gd.allGameObjects[0] = new gd.Player('images/char-boy.png',0);
+gd.allGameObjects[0] = new gd.Player(gd.playerActiveSprite,0);

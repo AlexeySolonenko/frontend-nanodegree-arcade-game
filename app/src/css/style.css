@@ -77,7 +77,7 @@ body {
 .game-menu-modal-body,
 .game-menu-home,
 .game-menu-player-sprite,
-.game-menu-player-sprite-btn,
+.game-menu-btn-player-sprite,
 .game-menu-btn-continue,
 .game-menu-btn-rules,
 .game-menu-btn-options,
@@ -93,7 +93,15 @@ body {
 .user-modal-player-sprite,
 .user-modal-player-sprite-button1,
 .user-modal-player-sprite-label,
-.btnPlayerSprite
+.btnPlayerSprite,
+{}
+
+
+/*
+*   PLAYER SPRITE CAROUSEL
+*/
+.carousel-player-sprite,
+.carousel-player-sprite-btn-ctrl
 {}
 
 
