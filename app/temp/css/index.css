@@ -66,6 +66,12 @@ body {
   z-index : 503;
 }
 
+.player-html{
+  position: absolute;
+  z-index: 504;
+  
+}
+
 /*
 *
 *    CLASS NAMES AS IDs

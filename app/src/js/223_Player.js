@@ -44,6 +44,7 @@ gd.Player = function(sprite,ID){
   this.belowNeighbour = 'free';
   this.type = 'player';
   this.outOfBorders = false;
+  this.message = '';
   gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
 gd.Player.prototype = Object.create(gd.MovingObject.prototype);
@@ -112,27 +113,22 @@ gd.Player.prototype.moveUp = function() {
 };
 
 
-gd.Player.prototype.moveDown = function(){
+gd.Player.prototype.moveDown = function() {
   var notBeyondBottomBorder = false;
   notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
   var noObstacleBelow = false;
   noObstacleBelow = gd.notBlockedNoEnemy1(this.belowNeighbourArr);
-  if(notBeyondBottomBorder&&noObstacleBelow){
+  if(notBeyondBottomBorder&&noObstacleBelow) {
     this.y = this.y + gd.cellHeight*gd.movementFrozen;
   }else{
     this.cannotDoIt();
   };
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
-gd.Player.prototype.getAttacked = function(){
- 
-  this.health = this.health - gd.hitsInThisCycle;
-  gd.hitsInThisCycle = 0;
-  if(this.health < 1)this.dying();
-  
-};
 
-gd.Player.prototype.handleInput = function(key){
+
+
+gd.Player.prototype.handleInput = function(key) {
   
   //if((this.x<0) || (this.y<0) || (this.x > (document.body.canvas.width-this.width)));
   
@@ -144,4 +140,43 @@ gd.Player.prototype.handleInput = function(key){
     
 };
 
-gd.allGameObjects[0] = new gd.Player(gd.playerActiveSprite,0);
+
+window.hidePlayer0Message = function() {
+  setTimeout(function() {
+    $('.player-html').tooltip("hide");
+    $('.player-html')[0].setAttribute('title','');  
+  }, 5000);
+  
+};
+
+
+gd.Player.prototype.tell = function(msg) {
+   
+  var oneToolTipAlreadyActive = false;
+  if($('.player-html + .tooltip').css('visibility') == 'visible') {
+    oneToolTipAlreadyActive = true;
+  };
+    
+  var newMsg = '';
+  
+  if(oneToolTipAlreadyActive) {
+    newMsg = $('.player-html + .tooltip .tooltip-inner').text() + "<br>" + msg;
+  } else {
+    newMsg = msg;
+  };
+  
+  $('.player-html')[0].setAttribute('title',newMsg);
+  if(!oneToolTipAlreadyActive){$('.player-html').tooltip("show");};
+  $('.player-html + .tooltip .tooltip-inner').text(newMsg);
+  window.hidePlayer0Message();  
+    
+};
+
+gd.Player.prototype.getAttacked = function() {
+  if(gd.hitsInThisCycle > 0){ this.tell('Ouch!');};
+  this.health = this.health - gd.hitsInThisCycle;
+  gd.hitsInThisCycle = 0;
+  if(this.health < 1)this.dying();
+  
+};
+

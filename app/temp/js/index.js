@@ -233,23 +233,25 @@ gd.movementFrozen = 1;
 gd.hitsInThisCycle = 0;
 gd.debugKey1 = false;
 
+
 gd.pause = function(main){
-if (gd.paused == true)
-  {
+if (gd.paused == true) {
     gd.paused = false;
     gd.gamePaused = 1;
     gd.movementFrozen = 1;
     document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";
+    $('.btnPause').removeClass('active');
     //window.requestAnimationFrame(main);
-  }
-else
-  {
+  } else {
     gd.paused = true;
     gd.gamePaused = 0;
     gd.movementFrozen = 0;
     document.getElementsByClassName('info-panel')[0].textContent = "Game is paused.";
+    $('.btnPause').addClass('active');
   };
 };
+
+
 gd.debugKey1Flip = function(){
   if(gd.debugKey1==true){gd.debugKey1=false}
   else{gd.debugKey1 = true;};
@@ -275,7 +277,7 @@ for (var i = 0;i<200;i++){
 * 
 */
 
-gd.resetPosRelations = function(obj){
+gd.resetPosRelations = function(obj) {
  if(obj.hasOwnProperty('rightNeighbourArr')){obj.rightNeighbourArr=[];};
  if(obj.hasOwnProperty('leftNeighbourArr')){obj.leftNeighbourArr=[];};
  if(obj.hasOwnProperty('topNeighbourArr')){obj.topNeighbourArr=[];};
@@ -469,7 +471,7 @@ gd.calculateGrid = function(ctx, canvas){
 
   var maxCanvasWidth = 0; //
   if (gd.windowVertical) {
-    maxCanvasWidth = window.innerWidth * 1;
+    maxCanvasWidth = window.innerWidth * 0.9;
   } else {
     maxCanvasWidth = window.innerWidth * 0.75;
   }; // in horizontal canvas takes only 9/12 of the grid;
@@ -485,7 +487,7 @@ gd.calculateGrid = function(ctx, canvas){
   };
   
   canvas.width = gd.numCols*gd.cellWidth;
-  canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
+  canvas.height = gd.numRows*gd.cellHeight ;//- gd.cellHeight/2;
   
   if ((gd.numColsPrev!=gd.numCols)||(gd.numRowsPrev!=gd.numRows)) {
     gd.layoutChanged = true;
@@ -508,9 +510,9 @@ gd.updateHTML = function() {
   */
   if(gd.windowVertical){
     // main layout
-    document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
-    document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
+    document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-9', 'col-sm-9', 'col-md-9', 'col-lg-9');
     document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('controlsDiv')[0].classList.remove('col-xs-3', 'col-sm-3', 'col-md-3', 'col-lg-3');
     document.getElementsByClassName('controlsDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
@@ -528,10 +530,10 @@ gd.updateHTML = function() {
   }
   else if(gd.windowHorizontal){
     // main layout
-    document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
     document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
+    document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-9', 'col-sm-9', 'col-md-9', 'col-lg-9');
     document.getElementsByClassName('controlsDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('controlsDiv')[0].classList.add('col-xs-3', 'col-sm-3', 'col-md-3', 'col-lg-3');
     // buttons
@@ -650,28 +652,16 @@ gd.gameMenuSetPrev = function(dontSetPrev) {
   
 };
 
+
 gd.gameMenuErase = function(dontSetPrev) {
   gd.gameMenuSetPrev(dontSetPrev);
   $('.game-menu-modal-body > div').hide(250);
 };
 
 
-gd.gameMenuTraceActivePlayerSprite = function(){
-  var el = '';
-  el = $('.game-menu-player-sprite .carousel-inner')[0];
-  var index = -1;
-  var bufIndex = 0;
-  var classList = [];
-  for(var i=0;i<el.childNodes.length;i++){
-    bufIndex = i;
-    classList = el.childNodes[i].classList;
-    for(var j = 0;j<classList.length;j++){
-      if(classList[j].search('active')!=-1){
-        index = bufIndex;
-      };
-    };
-  };
-  gd.playerActiveSprite = gd.playerAllSprites[index];
+
+gd.gameMenuSelectActiveSprite = function(){
+  gd.playerActiveSprite = $('.game-menu-player-sprite .carousel-inner .active img').attr('src');
 };
 
 gd.gameMenuButtonHTML = '<div class="col-xs-%%"><button class="btn btn-block btn-default %class% "><h3>%data%</h3></button></div>';
@@ -716,9 +706,14 @@ document.getElementsByClassName('btnMenu')[0].onclick = function(){
 
 gd.health = 50;
 
+window.showGameMenuOptions = function(){
+  $('.game-menu-options').show(1500);
+};
+
 $('.game-menu-btn-options').click(function(){
   gd.gameMenuErase();
-  $('.game-menu-options').show(500);
+  // (function(){$('.game-menu-options').show(1500);})();
+  window.showGameMenuOptions();
 });
 
 $('.game-menu-btn-player-sprite').click(function(){
@@ -734,8 +729,28 @@ $('.game-menu-btn-prev').click(function(){
   };
 });
 
+
 $('.carousel-player-sprite-btn-ctrl').click(function(){
-  gd.gameMenuTraceActivePlayerSprite();
+  gd.gameMenuSelectActiveSprite();
+});
+
+window.pauseDelayed = function(){
+  setTimeout(function(){
+    gd.pause();
+  }, 1500);
+};
+
+
+
+$('.game-menu-btn-continue').click(function(){
+  $('.gameMenuModal1').modal('hide');
+  // (function(){setTimeout(gd.pause, 5000);
+  //})();
+  
+});
+
+$('.gameMenuModal1').on('hidden.bs.modal', function(){
+  window.pauseDelayed();
 });
 
 /*
@@ -1270,7 +1285,7 @@ gd.swarmEnemies = function(){
   
   //for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
     
-  for(var i = 0,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3));i++){
+  for(var i = 10,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3))+10;i++){
     j++;
     if(j>(gd.numRows-3)){j=0;};
     // j++;
@@ -1335,6 +1350,7 @@ gd.Player = function(sprite,ID){
   this.belowNeighbour = 'free';
   this.type = 'player';
   this.outOfBorders = false;
+  this.message = '';
   gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
 gd.Player.prototype = Object.create(gd.MovingObject.prototype);
@@ -1403,27 +1419,22 @@ gd.Player.prototype.moveUp = function() {
 };
 
 
-gd.Player.prototype.moveDown = function(){
+gd.Player.prototype.moveDown = function() {
   var notBeyondBottomBorder = false;
   notBeyondBottomBorder = (this.y < (document.getElementsByTagName("CANVAS")[0].height - gd.cellHeight*2.5));
   var noObstacleBelow = false;
   noObstacleBelow = gd.notBlockedNoEnemy1(this.belowNeighbourArr);
-  if(notBeyondBottomBorder&&noObstacleBelow){
+  if(notBeyondBottomBorder&&noObstacleBelow) {
     this.y = this.y + gd.cellHeight*gd.movementFrozen;
   }else{
     this.cannotDoIt();
   };
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
-gd.Player.prototype.getAttacked = function(){
- 
-  this.health = this.health - gd.hitsInThisCycle;
-  gd.hitsInThisCycle = 0;
-  if(this.health < 1)this.dying();
-  
-};
 
-gd.Player.prototype.handleInput = function(key){
+
+
+gd.Player.prototype.handleInput = function(key) {
   
   //if((this.x<0) || (this.y<0) || (this.x > (document.body.canvas.width-this.width)));
   
@@ -1435,13 +1446,52 @@ gd.Player.prototype.handleInput = function(key){
     
 };
 
-gd.allGameObjects[0] = new gd.Player(gd.playerActiveSprite,0);
+
+window.hidePlayer0Message = function() {
+  setTimeout(function() {
+    $('.player-html').tooltip("hide");
+    $('.player-html')[0].setAttribute('title','');  
+  }, 5000);
+  
+};
+
+
+gd.Player.prototype.tell = function(msg) {
+   
+  var oneToolTipAlreadyActive = false;
+  if($('.player-html + .tooltip').css('visibility') == 'visible') {
+    oneToolTipAlreadyActive = true;
+  };
+    
+  var newMsg = '';
+  
+  if(oneToolTipAlreadyActive) {
+    newMsg = $('.player-html + .tooltip .tooltip-inner').text() + "<br>" + msg;
+  } else {
+    newMsg = msg;
+  };
+  
+  $('.player-html')[0].setAttribute('title',newMsg);
+  if(!oneToolTipAlreadyActive){$('.player-html').tooltip("show");};
+  $('.player-html + .tooltip .tooltip-inner').text(newMsg);
+  window.hidePlayer0Message();  
+    
+};
+
+gd.Player.prototype.getAttacked = function() {
+  if(gd.hitsInThisCycle > 0){ this.tell('Ouch!');};
+  this.health = this.health - gd.hitsInThisCycle;
+  gd.hitsInThisCycle = 0;
+  if(this.health < 1)this.dying();
+  
+};
+
 
 
 
  
 
-gd.updateHoveringItems = function(){
+gd.updateHoveringItems = function() {
     // $('.healthScore').remove(".healthScoreSpan");
     $('.health-bar-span').remove();
     gd.allGameObjects[0].namePosition = document.getElementsByClassName('player-name')[0];
@@ -1450,7 +1500,8 @@ gd.updateHoveringItems = function(){
 
 };
 
-gd.positionHoveringItems = function(){
+gd.positionHoveringItems = function() {
+  
     var namePosition = document.getElementsByClassName('player-name')[0];
     namePosition.style.left = "200px";
     namePosition.style.top = gd.cellHeight+"px";
@@ -1458,6 +1509,16 @@ gd.positionHoveringItems = function(){
     var healthScorePosition = document.getElementsByClassName('health-bar')[0];
     healthScorePosition.style.left = (gd.numCols*gd.cellWidth - gd.cellWidth/2 - healthScorePosition.getBoundingClientRect().width)+"px"; 
     healthScorePosition.style.top = gd.cellHeight+"px";
+    
+    var player0Position = document.getElementsByClassName('player-html')[0];
+    player0Position.style.left = gd.allGameObjects[0].x + gd.cellWidth + "px"; // + gd.cellWidth/2 + "px";
+    player0Position.style.top = gd.allGameObjects[0].y + "px";
+    
+    //there supposed to be only one tooltip on the scren for now
+    // not elaborated a methode to differentieate between different 
+    // tooltips yet
+    $('.tooltip').css('left',player0Position.style.left);
+    $('.tooltip').css('top',player0Position.style.top);
     //gd.player.namePosition = document.getElementsByClassName('playerName')[0];
     //gd.player.namePosition.style.top = gd.cellHeight+"px";
     //gd.player.namePosition.style.left = "100px";
@@ -1607,6 +1668,7 @@ var Engine = (function(global) {
       /* Call our update/render functions, pass along the time delta to
        * our update function since it may be used for smooth animation.
        */
+      
       update(dt);
       render(dt);
       /* Set our lastTime variable which is used to determine the time delta
@@ -1697,6 +1759,7 @@ var Engine = (function(global) {
     gd.updateHTML();
    
     gd.positionHoverDiv();
+    
     gd.updateHoveringItems();
     gd.positionHoveringItems();
      
@@ -1757,7 +1820,8 @@ var Engine = (function(global) {
    * from within their app.js files.
    */
   global.ctx = ctx;
-  gd.swarmEnemies();  
+  gd.swarmEnemies();
+  gd.allGameObjects[0] = new gd.Player(gd.plyerActiveSprite,0);
 })(this);
 
 

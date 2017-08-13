@@ -309,7 +309,7 @@ gd.swarmEnemies = function(){
   
   //for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
     
-  for(var i = 0,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3));i++){
+  for(var i = 10,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3))+10;i++){
     j++;
     if(j>(gd.numRows-3)){j=0;};
     // j++;

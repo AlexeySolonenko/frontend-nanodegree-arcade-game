@@ -59,6 +59,7 @@ var Engine = (function(global) {
       /* Call our update/render functions, pass along the time delta to
        * our update function since it may be used for smooth animation.
        */
+      
       update(dt);
       render(dt);
       /* Set our lastTime variable which is used to determine the time delta
@@ -149,6 +150,7 @@ var Engine = (function(global) {
     gd.updateHTML();
    
     gd.positionHoverDiv();
+    
     gd.updateHoveringItems();
     gd.positionHoveringItems();
      
@@ -209,5 +211,6 @@ var Engine = (function(global) {
    * from within their app.js files.
    */
   global.ctx = ctx;
-  gd.swarmEnemies();  
+  gd.swarmEnemies();
+  gd.allGameObjects[0] = new gd.Player(gd.plyerActiveSprite,0);
 })(this);

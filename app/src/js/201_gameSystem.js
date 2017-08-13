@@ -15,23 +15,25 @@ gd.movementFrozen = 1;
 gd.hitsInThisCycle = 0;
 gd.debugKey1 = false;
 
+
 gd.pause = function(main){
-if (gd.paused == true)
-  {
+if (gd.paused == true) {
     gd.paused = false;
     gd.gamePaused = 1;
     gd.movementFrozen = 1;
     document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";
+    $('.btnPause').removeClass('active');
     //window.requestAnimationFrame(main);
-  }
-else
-  {
+  } else {
     gd.paused = true;
     gd.gamePaused = 0;
     gd.movementFrozen = 0;
     document.getElementsByClassName('info-panel')[0].textContent = "Game is paused.";
+    $('.btnPause').addClass('active');
   };
 };
+
+
 gd.debugKey1Flip = function(){
   if(gd.debugKey1==true){gd.debugKey1=false}
   else{gd.debugKey1 = true;};
@@ -57,7 +59,7 @@ for (var i = 0;i<200;i++){
 * 
 */
 
-gd.resetPosRelations = function(obj){
+gd.resetPosRelations = function(obj) {
  if(obj.hasOwnProperty('rightNeighbourArr')){obj.rightNeighbourArr=[];};
  if(obj.hasOwnProperty('leftNeighbourArr')){obj.leftNeighbourArr=[];};
  if(obj.hasOwnProperty('topNeighbourArr')){obj.topNeighbourArr=[];};

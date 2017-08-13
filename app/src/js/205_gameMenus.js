@@ -31,28 +31,16 @@ gd.gameMenuSetPrev = function(dontSetPrev) {
   
 };
 
+
 gd.gameMenuErase = function(dontSetPrev) {
   gd.gameMenuSetPrev(dontSetPrev);
   $('.game-menu-modal-body > div').hide(250);
 };
 
 
-gd.gameMenuTraceActivePlayerSprite = function(){
-  var el = '';
-  el = $('.game-menu-player-sprite .carousel-inner')[0];
-  var index = -1;
-  var bufIndex = 0;
-  var classList = [];
-  for(var i=0;i<el.childNodes.length;i++){
-    bufIndex = i;
-    classList = el.childNodes[i].classList;
-    for(var j = 0;j<classList.length;j++){
-      if(classList[j].search('active')!=-1){
-        index = bufIndex;
-      };
-    };
-  };
-  gd.playerActiveSprite = gd.playerAllSprites[index];
+
+gd.gameMenuSelectActiveSprite = function(){
+  gd.playerActiveSprite = $('.game-menu-player-sprite .carousel-inner .active img').attr('src');
 };
 
 gd.gameMenuButtonHTML = '<div class="col-xs-%%"><button class="btn btn-block btn-default %class% "><h3>%data%</h3></button></div>';
@@ -97,9 +85,14 @@ document.getElementsByClassName('btnMenu')[0].onclick = function(){
 
 gd.health = 50;
 
+window.showGameMenuOptions = function(){
+  $('.game-menu-options').show(1500);
+};
+
 $('.game-menu-btn-options').click(function(){
   gd.gameMenuErase();
-  $('.game-menu-options').show(500);
+  // (function(){$('.game-menu-options').show(1500);})();
+  window.showGameMenuOptions();
 });
 
 $('.game-menu-btn-player-sprite').click(function(){
@@ -115,8 +108,28 @@ $('.game-menu-btn-prev').click(function(){
   };
 });
 
+
 $('.carousel-player-sprite-btn-ctrl').click(function(){
-  gd.gameMenuTraceActivePlayerSprite();
+  gd.gameMenuSelectActiveSprite();
+});
+
+window.pauseDelayed = function(){
+  setTimeout(function(){
+    gd.pause();
+  }, 1500);
+};
+
+
+
+$('.game-menu-btn-continue').click(function(){
+  $('.gameMenuModal1').modal('hide');
+  // (function(){setTimeout(gd.pause, 5000);
+  //})();
+  
+});
+
+$('.gameMenuModal1').on('hidden.bs.modal', function(){
+  window.pauseDelayed();
 });
 
 /*

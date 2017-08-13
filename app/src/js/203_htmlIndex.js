@@ -44,7 +44,7 @@ gd.calculateGrid = function(ctx, canvas){
 
   var maxCanvasWidth = 0; //
   if (gd.windowVertical) {
-    maxCanvasWidth = window.innerWidth * 1;
+    maxCanvasWidth = window.innerWidth * 0.9;
   } else {
     maxCanvasWidth = window.innerWidth * 0.75;
   }; // in horizontal canvas takes only 9/12 of the grid;
@@ -60,7 +60,7 @@ gd.calculateGrid = function(ctx, canvas){
   };
   
   canvas.width = gd.numCols*gd.cellWidth;
-  canvas.height = gd.cellHeight/2 + gd.numRows*gd.cellHeight;
+  canvas.height = gd.numRows*gd.cellHeight ;//- gd.cellHeight/2;
   
   if ((gd.numColsPrev!=gd.numCols)||(gd.numRowsPrev!=gd.numRows)) {
     gd.layoutChanged = true;
@@ -83,9 +83,9 @@ gd.updateHTML = function() {
   */
   if(gd.windowVertical){
     // main layout
-    document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
-    document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
+    document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-9', 'col-sm-9', 'col-md-9', 'col-lg-9');
     document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('controlsDiv')[0].classList.remove('col-xs-3', 'col-sm-3', 'col-md-3', 'col-lg-3');
     document.getElementsByClassName('controlsDiv')[0].classList.add('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
@@ -103,10 +103,10 @@ gd.updateHTML = function() {
   }
   else if(gd.windowHorizontal){
     // main layout
-    document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
+    // document.getElementsByClassName('gameMenuDiv')[0].classList.add('col-xs-1', 'col-sm-1', 'col-md-1', 'col-lg-1');
     document.getElementsByClassName('canvas-div')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
-    document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-8', 'col-sm-8', 'col-md-8', 'col-lg-8');
+    document.getElementsByClassName('canvas-div')[0].classList.add('col-xs-9', 'col-sm-9', 'col-md-9', 'col-lg-9');
     document.getElementsByClassName('controlsDiv')[0].classList.remove('col-xs-12', 'col-sm-12', 'col-md-12', 'col-lg-12');
     document.getElementsByClassName('controlsDiv')[0].classList.add('col-xs-3', 'col-sm-3', 'col-md-3', 'col-lg-3');
     // buttons
