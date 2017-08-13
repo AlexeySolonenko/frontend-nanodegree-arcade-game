@@ -58,6 +58,8 @@ gd.positionHoveringItems = function() {
           $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('top',(gd.allGameObjects[i].y + gd.cellHeight) + "px");
         };
         
+        
+        
       };
     }; // for 
 };
