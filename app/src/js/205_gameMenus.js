@@ -79,23 +79,24 @@ document.getElementsByClassName('btnMenu')[0].onclick = function(){
         };
         gd.gameMenuErase();
         $('.game-menu-home').show(500);
+        gd.gameMenuPrev = [];
         gd.gameMenuPrev.push('game-menu-home');
         $('.gameMenuModal1').modal('show');
 };
 
 gd.health = 50;
 
-window.showGameMenuOptions = function(){
+window.showGameMenuOptions = function() {
   $('.game-menu-options').show(1500);
 };
 
-$('.game-menu-btn-options').click(function(){
+$('.game-menu-btn-options').click(function() {
   gd.gameMenuErase();
   // (function(){$('.game-menu-options').show(1500);})();
   window.showGameMenuOptions();
 });
 
-$('.game-menu-btn-player-sprite').click(function(){
+$('.game-menu-btn-player-sprite').click(function() {
   gd.gameMenuErase();
   $('.game-menu-player-sprite').show(500);
 });
@@ -109,7 +110,7 @@ $('.game-menu-btn-prev').click(function(){
 });
 
 
-$('.carousel-player-sprite-btn-ctrl').click(function(){
+$('.carousel-player-sprite-btn-ctrl').click(function() {
   gd.gameMenuSelectActiveSprite();
 });
 
@@ -119,6 +120,13 @@ window.pauseDelayed = function(){
   }, 1500);
 };
 
+
+$('.game-menu-btn-rules').click(function() { 
+  gd.gameMenuErase();
+  // @TODO: to fill the text of the rules in.
+  // @TODO: remember to append to game-menu-rules first div child
+  $('.game-menu-rules').show();
+});
 
 
 $('.game-menu-btn-continue').click(function(){

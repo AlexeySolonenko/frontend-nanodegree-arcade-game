@@ -11,20 +11,30 @@ gd.updateHoveringItems = function() {
 
 };
 
+/*
+*
+*
+* POSITION HOVERING ITEMS FUNCTION
+*
+*
+*/
+
 gd.positionHoveringItems = function() {
-  
+    
+    // @desc: name position
     var namePosition = document.getElementsByClassName('player-name')[0];
     namePosition.style.left = "200px";
     namePosition.style.top = gd.cellHeight+"px";
     
+    // @desc: health bar position
     var healthScorePosition = document.getElementsByClassName('health-bar')[0];
     healthScorePosition.style.left = (gd.numCols*gd.cellWidth - gd.cellWidth/2 - healthScorePosition.getBoundingClientRect().width)+"px"; 
     healthScorePosition.style.top = gd.cellHeight+"px";
     
+    // @desc: player0 div for tooltip position and tooltip position
     var player0Position = document.getElementsByClassName('player-html')[0];
     player0Position.style.left = gd.allGameObjects[0].x + gd.cellWidth + "px"; // + gd.cellWidth/2 + "px";
     player0Position.style.top = gd.allGameObjects[0].y + "px";
-    
     //there supposed to be only one tooltip on the scren for now
     // not elaborated a methode to differentieate between different 
     // tooltips yet
@@ -34,4 +44,23 @@ gd.positionHoveringItems = function() {
     //gd.player.namePosition.style.top = gd.cellHeight+"px";
     //gd.player.namePosition.style.left = "100px";
     
+    // @desc: position of divs of enemies and theirs tooltips
+    
+    for(var i = 0; i < gd.allGameObjects.length; i++) {
+     
+      
+      if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy')) {
+        
+        
+        if(gd.allGameObjects[i].hasMesssage == true) {
+          if(gd.debugKey1){console.log('hello');};
+          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('left',gd.allGameObjects[i].x + "px");
+          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('top',gd.allGameObjects[i].y + "px");
+        };
+        
+      };
+    }; // for 
 };
+
+
+

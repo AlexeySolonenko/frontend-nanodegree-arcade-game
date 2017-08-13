@@ -37,7 +37,7 @@ gd.Player = function(sprite,ID){
   this.returnToStart(); // defines 
   this.name = 'Player Prototype';
   this.namePosition = {};
-  this.health = 1000;
+  this.health = 20;
   this.leftNeighbour = 'free'; // can be   bro || blocked ||  free
   this.rightNeighbour = 'free';
   this.topNeighbour = 'free';
@@ -45,6 +45,7 @@ gd.Player = function(sprite,ID){
   this.type = 'player';
   this.outOfBorders = false;
   this.message = '';
+  this.beingCongratulated = false;
   gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
 gd.Player.prototype = Object.create(gd.MovingObject.prototype);
@@ -62,9 +63,10 @@ gd.Player.prototype.cannotDoIt = function(){
 };
 
 gd.Player.prototype.returnToStart = function(){
+  this.beingCongratulated = false;
   this.x = gd.cellWidth*2;
   this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
-  this.health = 1000;
+  this.health = 20;
 };
 
 gd.Player.prototype.dying = function(){
@@ -90,7 +92,7 @@ gd.Player.prototype.moveLeft = function(){
 };
 
 gd.Player.prototype.moveRight = function(){
-  var noOstacleAtRight = false;
+  var noObstacleAtRight = false;
   noObstacleAtRight = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
   var notBeyondRightBorder = false;
   notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
@@ -160,15 +162,24 @@ gd.Player.prototype.tell = function(msg) {
   var newMsg = '';
   
   if(oneToolTipAlreadyActive) {
-    newMsg = $('.player-html + .tooltip .tooltip-inner').text() + "<br>" + msg;
+    newMsg = $('.player-html + .tooltip .tooltip-inner').html() + "<br /br>" + msg;
   } else {
     newMsg = msg;
   };
   
-  $('.player-html')[0].setAttribute('title',newMsg);
-  if(!oneToolTipAlreadyActive){$('.player-html').tooltip("show");};
-  $('.player-html + .tooltip .tooltip-inner').text(newMsg);
-  window.hidePlayer0Message();  
+  //$('.player-html')[0].setAttribute('title',newMsg);
+
+  if(!oneToolTipAlreadyActive) {
+    $('.player-html').tooltip("show");
+    window.hidePlayer0Message();
+  };
+  
+  if(newMsg.length>20) {
+    newMsg = newMsg + "<br /br>" + 'Aaaaa!';
+  };
+  
+  $('.player-html + .tooltip .tooltip-inner').html(newMsg);
+ 
     
 };
 
@@ -178,5 +189,45 @@ gd.Player.prototype.getAttacked = function() {
   gd.hitsInThisCycle = 0;
   if(this.health < 1)this.dying();
   
+};  // END OF getAttacked
+
+
+gd.Player.prototype.checkForWinLevel1 = function() {
+  var result;
+  var playerAtWater = false;
+  
+  if(this.y < 0) { playerAtWater = true; 
+  };
+  
+  return playerAtWater;
+};
+
+
+gd.Player.prototype.checkForWin = function() {
+  var result = [];
+  var winMsg = '';
+
+// CHECK IF PLAYER WON DEPENDING ON CURRENT GAME LEVEL
+  if(gd.currentLevel == 1) {
+    result[0] = {level:1};
+    result[1] = this.checkForWinLevel1();    
+  };
+
+  
+// PREPARE WIN MESSAGE DEPENDING ON CURRENT LEVEL
+  winMsg = 'Congratulations! You won level ' + result[0]['level'] +
+    '. Get ready for next challenge! Good luck!';
+  
+  if(result[1] && (gd.framesCounter > 2) && (!this.beingCongratulated)) {
+    if(gd.debugKey1){console.log('won');};
+    $('.modal-congrats .modal-body > div').html('');
+    $('.modal-congrats .modal-body > div').html(winMsg);
+    $('.modal-congrats').modal('show');
+    this.beingCongratulated = true;
+    this.returnToStart();
+  };
+  // modal-congrats-btn-next
+  // modal-congrats-btn-same
+  return result;
 };
 

@@ -38,16 +38,6 @@ var Engine = (function(global) {
   /* This function serves as the kickoff point for the game loop itself
    * and handles properly calling the update and render methods.
    */
-  /* 
-  function loopPause(){
-    if(gd.paused){
-      loopPause();
-    }
-    else{
-     win.requestAnimationFrame(main);
-    };
-  };
-  */
   function main() {
       /* Get our time delta information which is required if your game
        * requires smooth animation. Because everyone's computer processes
@@ -56,10 +46,11 @@ var Engine = (function(global) {
        * computer is) - hurray time!
        */      
       var now = Date.now(), dt = (now - lastTime) / 1000.0;
+      gd.framesCounter++;
+      if(gd.framesCounter > 10000000){gd.framesCounter = 0;};
       /* Call our update/render functions, pass along the time delta to
        * our update function since it may be used for smooth animation.
        */
-      
       update(dt);
       render(dt);
       /* Set our lastTime variable which is used to determine the time delta
@@ -72,6 +63,8 @@ var Engine = (function(global) {
      win.requestAnimationFrame(main);
   }; // main()
 
+  
+  
   /* This function does some initial setup that should only occur once,
    * particularly setting the lastTime variable that is required for the
    * game loop.
@@ -83,7 +76,7 @@ var Engine = (function(global) {
       gd.allGameObjects[0].returnToStart();
       gd.landscape.build();
       document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";      
-  };
+  }; // init()
 
   /* This function is called by main (our game loop) and itself calls all
    * of the functions which may need to update entity's data. Based on how
@@ -95,10 +88,7 @@ var Engine = (function(global) {
    * on the entities themselves within your app.js file).
    */
   function update(dt) {
-     
       updateEntities(dt);
-      
-      
       gd.allGameObjects[0].getAttacked();
 
   };
@@ -114,23 +104,20 @@ var Engine = (function(global) {
     gd.swarmEnemies(); // generate new enemies if there is enough space on the screen
     gd.resetPosRelationsOfAll(); // reset/empty the arrays mentioned on the following below comment
     gd.findCurrentPositions(); // each object has 5 arrays holding IDs of other obects located to left/right/up/down/collide - update those
-    
-    
-    for(var i = 0;i<gd.allGameObjects.length;i++){
-      if(gd.allGameObjects[i].type == 'enemy'){
-        gd.allGameObjects[i].defineDirection();
-        gd.allGameObjects[i].update(dt);  
-      };
-    };
+    gd.updateEnemiesDirections(dt);
+    gd.deleteEnemiesWentOutOfScreen(dt);
+    /*
     for(var i = 0;i<gd.allGameObjects.length;i++){
       if(gd.allGameObjects[i].type == 'enemy'){
         // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
         gd.allGameObjects[i].eraser();  
       };
     };
+    */
     gd.updateAttackers(); // update attacking/notattacking state of each enemy
     gd.allGameObjects[0].update(dt); // update Player 
-      
+    gd.allGameObjects[0].checkForWin(); // check if Player won current level
+    
   }; // END OF function updateEntities()
   
 
@@ -142,21 +129,22 @@ var Engine = (function(global) {
    */
   function render() {
     gd.calculateGrid(ctx,canvas);
+    
     if (gd.layoutChanged) {
       gd.allGameObjects[0].returnToStart();
       gd.landscape.build();
       gd.layoutChanged = false;
     };
-    gd.updateHTML();
-   
-    gd.positionHoverDiv();
     
+    gd.updateHTML();
+    gd.generateDivsForTooltipsOfEnemies();
+    gd.positionHoverDiv();
     gd.updateHoveringItems();
     gd.positionHoveringItems();
      
     gd.renderTiles(ctx,canvas);
     gd.landscape.renderAll();
-    renderEntities();
+    gd.renderEntities();
     document.getElementsByClassName('html-atop-canvas')[0].left = ctx.x;
     document.getElementsByClassName('html-atop-canvas')[0].top = document.getElementsByTagName("CANVAS")[0].y;
     
@@ -211,6 +199,6 @@ var Engine = (function(global) {
    * from within their app.js files.
    */
   global.ctx = ctx;
-  gd.swarmEnemies();
-  gd.allGameObjects[0] = new gd.Player(gd.plyerActiveSprite,0);
+  gd.swarmEnemies(); // initialize and create first batch of Enemies
+  gd.allGameObjects[0] = new gd.Player(gd.plyerActiveSprite,0); // create Player
 })(this);

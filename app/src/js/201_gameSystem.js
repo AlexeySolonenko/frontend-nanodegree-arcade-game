@@ -14,6 +14,8 @@ gd.gamePaused = 1;
 gd.movementFrozen = 1; 
 gd.hitsInThisCycle = 0;
 gd.debugKey1 = false;
+gd.currentLevel = 1;
+gd.framesCounter = 0;
 
 
 gd.pause = function(main){

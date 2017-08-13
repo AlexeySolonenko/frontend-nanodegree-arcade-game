@@ -31,6 +31,7 @@ gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.y = y;
   this.ID = ID; // address in gd.allGameObjects array to referr to
   this.attacking = false;
+  this.hasMessage = false;
   gd.MovingObject.call(this,x,y,sprite,ID,this.speed,direction,type);
 };
 
@@ -80,19 +81,10 @@ gd.Enemy.prototype.update = function(dt){
   // You should multiply any movement by the dt parameter
   // which will ensure the game runs at the same speed for
   // all computers.
-  // this.moveEn(dt);
-  
-  /* 
-  for(var i = 0;i<gd.allGameObjects.length;i++){
-    if(gd.allGameObjects[i].type=='enemy'){
-      gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
-    };
-   
-  };
-  */
   this.move(dt);
  
-}; // function
+}; // update
+
 
 // Draw the enemy on the screen, required method for game
 gd.Enemy.prototype.render = function() {
@@ -128,7 +120,7 @@ gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
 */
 
 
-gd.EnemySoldier.prototype.defineDirection = function(){
+gd.EnemySoldier.prototype.defineDirection = function() {
   
   // if can go either up or down, then select at random
   // the below variable is just for random
@@ -207,13 +199,6 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     steppedRight = true;
   };
   
-  /* if(dodging){
-    
-  } else if(returning&&(!dodging)){
-    
-  } else if((!dodging){
-    
-  };*/
   
   if((right)&&(!rightFree)&&(!dodging)){
     if((topFree)&&(belowFree)){
@@ -272,6 +257,14 @@ gd.EnemySoldier.prototype.defineDirection = function(){
 *
 */
 
+
+/*
+*
+*
+* ENEMY WILD CLASS
+*
+*
+*/
 gd.EnemySoldierWild = function(x,y,sprite,ID){
   this.type = 'SoldierWild';
   gd.EnemySoldier.call(this,x,y,sprite,ID);
@@ -283,6 +276,13 @@ gd.testEnemy = {};
 gd.makeEnemySoldierWild = function(){
   gd.testEnemy = new gd.EnemySoldierWild(100,100,'images/enemy-bug.png',70); 
 };
+
+/**
+* 
+* END OF   ENEMY WILD CLASS
+*
+*/
+
 /*
 *
 *
@@ -290,20 +290,8 @@ gd.makeEnemySoldierWild = function(){
 *
 *
 */
-/*
-while(i != 1){
-if(gd.checkCollisions.search('collisionID') != -1){
-sliceStart = collisions.search('collisionID')+11;
-sliceEnd = collisions.slice(sliceStart).search(';');
-searchResult = collisions.slice(sliceStart,sliceStart+sliceEnd);
-searchResult = Number(searchResult);
-collisionsArr.push(searchResult);
-collisions = collisions.slice(sliceStart+sliceEnd);
-} else {
-i = 1;
-};
-};
-*/   
+
+  
 gd.swarmEnemies = function(){
   
   
@@ -326,4 +314,59 @@ gd.swarmEnemies = function(){
     };
 
   };// for i - main loop
-};// function
+};// swarmEnemies
+
+
+gd.updateEnemiesDirections = function(dt){
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i].type == 'enemy'){
+      gd.allGameObjects[i].defineDirection();
+      gd.allGameObjects[i].update(dt);  
+    };
+  };
+}; // updateEnemiesDirections
+
+
+gd.deleteEnemiesWentOutOfScreen = function(dt){
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i].type == 'enemy'){
+    // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
+    gd.allGameObjects[i].eraser();  
+    };
+  };
+}; // deleteEnemiesWentOutOfScreen
+
+
+/*
+*
+*
+* GENERATE DIVS FOR TOOLTIPS OF ENEMIES FUNCTION
+*
+*
+*/
+
+gd.generateDivsForTooltipsOfEnemies = function(){
+  
+  for(var i = 0; i < gd.allGameObjects.length; i++) {
+    
+    var formattedHTML = '';
+    
+    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy') && (!gd.allGameObjects[i].hasMessage)) {
+      gd.allGameObjects[i].hasMessage = true;
+      formattedHTML = '<div class="enemy-'+gd.allGameObjects[i].ID+
+        '-html" data-toggle="tooltip" data-placement="left" title="%data%">test</div>';
+      $('.html-atop-canvas').append(formattedHTML);
+      
+  // html-atop-canvas
+    }; // if not free and enemy
+  }; // for 
+  
+}
+
+
+/**
+* 
+* END OF   ENEMY WILD CLASS
+*
+*/
+

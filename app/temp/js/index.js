@@ -232,6 +232,8 @@ gd.gamePaused = 1;
 gd.movementFrozen = 1; 
 gd.hitsInThisCycle = 0;
 gd.debugKey1 = false;
+gd.currentLevel = 1;
+gd.framesCounter = 0;
 
 
 gd.pause = function(main){
@@ -700,23 +702,24 @@ document.getElementsByClassName('btnMenu')[0].onclick = function(){
         };
         gd.gameMenuErase();
         $('.game-menu-home').show(500);
+        gd.gameMenuPrev = [];
         gd.gameMenuPrev.push('game-menu-home');
         $('.gameMenuModal1').modal('show');
 };
 
 gd.health = 50;
 
-window.showGameMenuOptions = function(){
+window.showGameMenuOptions = function() {
   $('.game-menu-options').show(1500);
 };
 
-$('.game-menu-btn-options').click(function(){
+$('.game-menu-btn-options').click(function() {
   gd.gameMenuErase();
   // (function(){$('.game-menu-options').show(1500);})();
   window.showGameMenuOptions();
 });
 
-$('.game-menu-btn-player-sprite').click(function(){
+$('.game-menu-btn-player-sprite').click(function() {
   gd.gameMenuErase();
   $('.game-menu-player-sprite').show(500);
 });
@@ -730,7 +733,7 @@ $('.game-menu-btn-prev').click(function(){
 });
 
 
-$('.carousel-player-sprite-btn-ctrl').click(function(){
+$('.carousel-player-sprite-btn-ctrl').click(function() {
   gd.gameMenuSelectActiveSprite();
 });
 
@@ -740,6 +743,13 @@ window.pauseDelayed = function(){
   }, 1500);
 };
 
+
+$('.game-menu-btn-rules').click(function() { 
+  gd.gameMenuErase();
+  // @TODO: to fill the text of the rules in.
+  // @TODO: remember to append to game-menu-rules first div child
+  $('.game-menu-rules').show();
+});
 
 
 $('.game-menu-btn-continue').click(function(){
@@ -1007,6 +1017,7 @@ gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.y = y;
   this.ID = ID; // address in gd.allGameObjects array to referr to
   this.attacking = false;
+  this.hasMessage = false;
   gd.MovingObject.call(this,x,y,sprite,ID,this.speed,direction,type);
 };
 
@@ -1056,19 +1067,10 @@ gd.Enemy.prototype.update = function(dt){
   // You should multiply any movement by the dt parameter
   // which will ensure the game runs at the same speed for
   // all computers.
-  // this.moveEn(dt);
-  
-  /* 
-  for(var i = 0;i<gd.allGameObjects.length;i++){
-    if(gd.allGameObjects[i].type=='enemy'){
-      gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
-    };
-   
-  };
-  */
   this.move(dt);
  
-}; // function
+}; // update
+
 
 // Draw the enemy on the screen, required method for game
 gd.Enemy.prototype.render = function() {
@@ -1104,7 +1106,7 @@ gd.EnemySoldier.prototype.constructor = gd.EnemySoldier;
 */
 
 
-gd.EnemySoldier.prototype.defineDirection = function(){
+gd.EnemySoldier.prototype.defineDirection = function() {
   
   // if can go either up or down, then select at random
   // the below variable is just for random
@@ -1183,13 +1185,6 @@ gd.EnemySoldier.prototype.defineDirection = function(){
     steppedRight = true;
   };
   
-  /* if(dodging){
-    
-  } else if(returning&&(!dodging)){
-    
-  } else if((!dodging){
-    
-  };*/
   
   if((right)&&(!rightFree)&&(!dodging)){
     if((topFree)&&(belowFree)){
@@ -1248,6 +1243,14 @@ gd.EnemySoldier.prototype.defineDirection = function(){
 *
 */
 
+
+/*
+*
+*
+* ENEMY WILD CLASS
+*
+*
+*/
 gd.EnemySoldierWild = function(x,y,sprite,ID){
   this.type = 'SoldierWild';
   gd.EnemySoldier.call(this,x,y,sprite,ID);
@@ -1259,6 +1262,13 @@ gd.testEnemy = {};
 gd.makeEnemySoldierWild = function(){
   gd.testEnemy = new gd.EnemySoldierWild(100,100,'images/enemy-bug.png',70); 
 };
+
+/**
+* 
+* END OF   ENEMY WILD CLASS
+*
+*/
+
 /*
 *
 *
@@ -1266,20 +1276,8 @@ gd.makeEnemySoldierWild = function(){
 *
 *
 */
-/*
-while(i != 1){
-if(gd.checkCollisions.search('collisionID') != -1){
-sliceStart = collisions.search('collisionID')+11;
-sliceEnd = collisions.slice(sliceStart).search(';');
-searchResult = collisions.slice(sliceStart,sliceStart+sliceEnd);
-searchResult = Number(searchResult);
-collisionsArr.push(searchResult);
-collisions = collisions.slice(sliceStart+sliceEnd);
-} else {
-i = 1;
-};
-};
-*/   
+
+  
 gd.swarmEnemies = function(){
   
   
@@ -1302,7 +1300,62 @@ gd.swarmEnemies = function(){
     };
 
   };// for i - main loop
-};// function
+};// swarmEnemies
+
+
+gd.updateEnemiesDirections = function(dt){
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i].type == 'enemy'){
+      gd.allGameObjects[i].defineDirection();
+      gd.allGameObjects[i].update(dt);  
+    };
+  };
+}; // updateEnemiesDirections
+
+
+gd.deleteEnemiesWentOutOfScreen = function(dt){
+  for(var i = 0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i].type == 'enemy'){
+    // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
+    gd.allGameObjects[i].eraser();  
+    };
+  };
+}; // deleteEnemiesWentOutOfScreen
+
+
+/*
+*
+*
+* GENERATE DIVS FOR TOOLTIPS OF ENEMIES FUNCTION
+*
+*
+*/
+
+gd.generateDivsForTooltipsOfEnemies = function(){
+  
+  for(var i = 0; i < gd.allGameObjects.length; i++) {
+    
+    var formattedHTML = '';
+    
+    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy') && (!gd.allGameObjects[i].hasMessage)) {
+      gd.allGameObjects[i].hasMessage = true;
+      formattedHTML = '<div class="enemy-'+gd.allGameObjects[i].ID+
+        '-html" data-toggle="tooltip" data-placement="left" title="%data%">test</div>';
+      $('.html-atop-canvas').append(formattedHTML);
+      
+  // html-atop-canvas
+    }; // if not free and enemy
+  }; // for 
+  
+}
+
+
+/**
+* 
+* END OF   ENEMY WILD CLASS
+*
+*/
+
 
 
 
@@ -1343,7 +1396,7 @@ gd.Player = function(sprite,ID){
   this.returnToStart(); // defines 
   this.name = 'Player Prototype';
   this.namePosition = {};
-  this.health = 1000;
+  this.health = 20;
   this.leftNeighbour = 'free'; // can be   bro || blocked ||  free
   this.rightNeighbour = 'free';
   this.topNeighbour = 'free';
@@ -1351,6 +1404,7 @@ gd.Player = function(sprite,ID){
   this.type = 'player';
   this.outOfBorders = false;
   this.message = '';
+  this.beingCongratulated = false;
   gd.MovingObject.call(this,-100,-100,sprite,ID,0,'stay','player');
 };
 gd.Player.prototype = Object.create(gd.MovingObject.prototype);
@@ -1368,9 +1422,10 @@ gd.Player.prototype.cannotDoIt = function(){
 };
 
 gd.Player.prototype.returnToStart = function(){
+  this.beingCongratulated = false;
   this.x = gd.cellWidth*2;
   this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
-  this.health = 1000;
+  this.health = 20;
 };
 
 gd.Player.prototype.dying = function(){
@@ -1396,7 +1451,7 @@ gd.Player.prototype.moveLeft = function(){
 };
 
 gd.Player.prototype.moveRight = function(){
-  var noOstacleAtRight = false;
+  var noObstacleAtRight = false;
   noObstacleAtRight = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
   var notBeyondRightBorder = false;
   notBeyondRightBorder = (this.x<(document.getElementsByTagName("CANVAS")[0].width - gd.cellWidth));
@@ -1466,15 +1521,24 @@ gd.Player.prototype.tell = function(msg) {
   var newMsg = '';
   
   if(oneToolTipAlreadyActive) {
-    newMsg = $('.player-html + .tooltip .tooltip-inner').text() + "<br>" + msg;
+    newMsg = $('.player-html + .tooltip .tooltip-inner').html() + "<br /br>" + msg;
   } else {
     newMsg = msg;
   };
   
-  $('.player-html')[0].setAttribute('title',newMsg);
-  if(!oneToolTipAlreadyActive){$('.player-html').tooltip("show");};
-  $('.player-html + .tooltip .tooltip-inner').text(newMsg);
-  window.hidePlayer0Message();  
+  //$('.player-html')[0].setAttribute('title',newMsg);
+
+  if(!oneToolTipAlreadyActive) {
+    $('.player-html').tooltip("show");
+    window.hidePlayer0Message();
+  };
+  
+  if(newMsg.length>20) {
+    newMsg = newMsg + "<br /br>" + 'Aaaaa!';
+  };
+  
+  $('.player-html + .tooltip .tooltip-inner').html(newMsg);
+ 
     
 };
 
@@ -1484,6 +1548,46 @@ gd.Player.prototype.getAttacked = function() {
   gd.hitsInThisCycle = 0;
   if(this.health < 1)this.dying();
   
+};  // END OF getAttacked
+
+
+gd.Player.prototype.checkForWinLevel1 = function() {
+  var result;
+  var playerAtWater = false;
+  
+  if(this.y < 0) { playerAtWater = true; 
+  };
+  
+  return playerAtWater;
+};
+
+
+gd.Player.prototype.checkForWin = function() {
+  var result = [];
+  var winMsg = '';
+
+// CHECK IF PLAYER WON DEPENDING ON CURRENT GAME LEVEL
+  if(gd.currentLevel == 1) {
+    result[0] = {level:1};
+    result[1] = this.checkForWinLevel1();    
+  };
+
+  
+// PREPARE WIN MESSAGE DEPENDING ON CURRENT LEVEL
+  winMsg = 'Congratulations! You won level ' + result[0]['level'] +
+    '. Get ready for next challenge! Good luck!';
+  
+  if(result[1] && (gd.framesCounter > 2) && (!this.beingCongratulated)) {
+    if(gd.debugKey1){console.log('won');};
+    $('.modal-congrats .modal-body > div').html('');
+    $('.modal-congrats .modal-body > div').html(winMsg);
+    $('.modal-congrats').modal('show');
+    this.beingCongratulated = true;
+    this.returnToStart();
+  };
+  // modal-congrats-btn-next
+  // modal-congrats-btn-same
+  return result;
 };
 
 
@@ -1500,20 +1604,30 @@ gd.updateHoveringItems = function() {
 
 };
 
+/*
+*
+*
+* POSITION HOVERING ITEMS FUNCTION
+*
+*
+*/
+
 gd.positionHoveringItems = function() {
-  
+    
+    // @desc: name position
     var namePosition = document.getElementsByClassName('player-name')[0];
     namePosition.style.left = "200px";
     namePosition.style.top = gd.cellHeight+"px";
     
+    // @desc: health bar position
     var healthScorePosition = document.getElementsByClassName('health-bar')[0];
     healthScorePosition.style.left = (gd.numCols*gd.cellWidth - gd.cellWidth/2 - healthScorePosition.getBoundingClientRect().width)+"px"; 
     healthScorePosition.style.top = gd.cellHeight+"px";
     
+    // @desc: player0 div for tooltip position and tooltip position
     var player0Position = document.getElementsByClassName('player-html')[0];
     player0Position.style.left = gd.allGameObjects[0].x + gd.cellWidth + "px"; // + gd.cellWidth/2 + "px";
     player0Position.style.top = gd.allGameObjects[0].y + "px";
-    
     //there supposed to be only one tooltip on the scren for now
     // not elaborated a methode to differentieate between different 
     // tooltips yet
@@ -1523,7 +1637,26 @@ gd.positionHoveringItems = function() {
     //gd.player.namePosition.style.top = gd.cellHeight+"px";
     //gd.player.namePosition.style.left = "100px";
     
+    // @desc: position of divs of enemies and theirs tooltips
+    
+    for(var i = 0; i < gd.allGameObjects.length; i++) {
+     
+      
+      if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy')) {
+        
+        
+        if(gd.allGameObjects[i].hasMesssage == true) {
+          if(gd.debugKey1){console.log('hello');};
+          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('left',gd.allGameObjects[i].x + "px");
+          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('top',gd.allGameObjects[i].y + "px");
+        };
+        
+      };
+    }; // for 
 };
+
+
+
 
 
 
@@ -1565,8 +1698,15 @@ gd.updateAttackers = function() {
 }; // END OF updateAttackers = function()
 
 
-
-
+gd.renderEntities = function() {
+  for(var i=0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i].type=='enemy'){
+      gd.allGameObjects[i].render(); 
+    };
+  };
+  
+  gd.allGameObjects[0].render();
+}; // END OF renderEnetities
 
 
 
@@ -1647,16 +1787,6 @@ var Engine = (function(global) {
   /* This function serves as the kickoff point for the game loop itself
    * and handles properly calling the update and render methods.
    */
-  /* 
-  function loopPause(){
-    if(gd.paused){
-      loopPause();
-    }
-    else{
-     win.requestAnimationFrame(main);
-    };
-  };
-  */
   function main() {
       /* Get our time delta information which is required if your game
        * requires smooth animation. Because everyone's computer processes
@@ -1665,10 +1795,11 @@ var Engine = (function(global) {
        * computer is) - hurray time!
        */      
       var now = Date.now(), dt = (now - lastTime) / 1000.0;
+      gd.framesCounter++;
+      if(gd.framesCounter > 10000000){gd.framesCounter = 0;};
       /* Call our update/render functions, pass along the time delta to
        * our update function since it may be used for smooth animation.
        */
-      
       update(dt);
       render(dt);
       /* Set our lastTime variable which is used to determine the time delta
@@ -1681,6 +1812,8 @@ var Engine = (function(global) {
      win.requestAnimationFrame(main);
   }; // main()
 
+  
+  
   /* This function does some initial setup that should only occur once,
    * particularly setting the lastTime variable that is required for the
    * game loop.
@@ -1692,7 +1825,7 @@ var Engine = (function(global) {
       gd.allGameObjects[0].returnToStart();
       gd.landscape.build();
       document.getElementsByClassName('info-panel')[0].textContent = "Game is running.";      
-  };
+  }; // init()
 
   /* This function is called by main (our game loop) and itself calls all
    * of the functions which may need to update entity's data. Based on how
@@ -1704,10 +1837,7 @@ var Engine = (function(global) {
    * on the entities themselves within your app.js file).
    */
   function update(dt) {
-     
       updateEntities(dt);
-      
-      
       gd.allGameObjects[0].getAttacked();
 
   };
@@ -1723,23 +1853,20 @@ var Engine = (function(global) {
     gd.swarmEnemies(); // generate new enemies if there is enough space on the screen
     gd.resetPosRelationsOfAll(); // reset/empty the arrays mentioned on the following below comment
     gd.findCurrentPositions(); // each object has 5 arrays holding IDs of other obects located to left/right/up/down/collide - update those
-    
-    
-    for(var i = 0;i<gd.allGameObjects.length;i++){
-      if(gd.allGameObjects[i].type == 'enemy'){
-        gd.allGameObjects[i].defineDirection();
-        gd.allGameObjects[i].update(dt);  
-      };
-    };
+    gd.updateEnemiesDirections(dt);
+    gd.deleteEnemiesWentOutOfScreen(dt);
+    /*
     for(var i = 0;i<gd.allGameObjects.length;i++){
       if(gd.allGameObjects[i].type == 'enemy'){
         // gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects);
         gd.allGameObjects[i].eraser();  
       };
     };
+    */
     gd.updateAttackers(); // update attacking/notattacking state of each enemy
     gd.allGameObjects[0].update(dt); // update Player 
-      
+    gd.allGameObjects[0].checkForWin(); // check if Player won current level
+    
   }; // END OF function updateEntities()
   
 
@@ -1751,21 +1878,22 @@ var Engine = (function(global) {
    */
   function render() {
     gd.calculateGrid(ctx,canvas);
+    
     if (gd.layoutChanged) {
       gd.allGameObjects[0].returnToStart();
       gd.landscape.build();
       gd.layoutChanged = false;
     };
-    gd.updateHTML();
-   
-    gd.positionHoverDiv();
     
+    gd.updateHTML();
+    gd.generateDivsForTooltipsOfEnemies();
+    gd.positionHoverDiv();
     gd.updateHoveringItems();
     gd.positionHoveringItems();
      
     gd.renderTiles(ctx,canvas);
     gd.landscape.renderAll();
-    renderEntities();
+    gd.renderEntities();
     document.getElementsByClassName('html-atop-canvas')[0].left = ctx.x;
     document.getElementsByClassName('html-atop-canvas')[0].top = document.getElementsByTagName("CANVAS")[0].y;
     
@@ -1820,8 +1948,8 @@ var Engine = (function(global) {
    * from within their app.js files.
    */
   global.ctx = ctx;
-  gd.swarmEnemies();
-  gd.allGameObjects[0] = new gd.Player(gd.plyerActiveSprite,0);
+  gd.swarmEnemies(); // initialize and create first batch of Enemies
+  gd.allGameObjects[0] = new gd.Player(gd.plyerActiveSprite,0); // create Player
 })(this);
 
 

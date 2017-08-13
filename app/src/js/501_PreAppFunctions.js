@@ -38,3 +38,15 @@ gd.updateAttackers = function() {
 }; // END OF updateAttackers = function()
 
 
+gd.renderEntities = function() {
+  for(var i=0;i<gd.allGameObjects.length;i++){
+    if(gd.allGameObjects[i].type=='enemy'){
+      gd.allGameObjects[i].render(); 
+    };
+  };
+  
+  gd.allGameObjects[0].render();
+}; // END OF renderEnetities
+
+
+

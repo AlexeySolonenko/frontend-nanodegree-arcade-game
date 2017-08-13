@@ -139,3 +139,59 @@ body {
 {}
 
 
+/*
+*   ENEMY MODAL IDS
+*/
+.enemy-10-html,
+.enemy-11-html,
+.enemy-12-html,
+.enemy-13-html,
+.enemy-14-html,
+.enemy-15-html,
+.enemy-16-html,
+.enemy-17-html,
+.enemy-18-html,
+.enemy-19-html,
+.enemy-20-html,
+.enemy-21-html,
+.enemy-22-html,
+.enemy-23-html,
+.enemy-24-html,
+.enemy-25-html,
+.enemy-26-html,
+.enemy-27-html,
+.enemy-28-html,
+.enemy-29-html,
+.enemy-30-html,
+.enemy-31-html,
+.enemy-32-html,
+.enemy-33-html,
+.enemy-34-html,
+.enemy-35-html,
+.enemy-36-html
+{
+  position: absolute;
+  z-index: 507;
+
+}
+
+
+/*
+*   MODAL FOR GAME MENU RULES
+*/
+
+/*
+*   MODAL YOU WON CONGRATULATIONS
+*/
+.modal-congrats,
+.modal-congrats-btn-next,
+.modal-congrats-btn-same,
+.modal-congrats-btn-close,
+.modal-congrats-label
+{
+
+  
+}
+
+
+
