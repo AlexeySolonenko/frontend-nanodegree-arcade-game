@@ -1645,10 +1645,10 @@ gd.positionHoveringItems = function() {
       if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy')) {
         
         
-        if(gd.allGameObjects[i].hasMesssage == true) {
+        if(gd.allGameObjects[i].hasMessage == true) {
           if(gd.debugKey1){console.log('hello');};
-          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('left',gd.allGameObjects[i].x + "px");
-          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('top',gd.allGameObjects[i].y + "px");
+          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('left',(gd.allGameObjects[i].x + gd.cellWidth) + "px");
+          $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('top',(gd.allGameObjects[i].y + gd.cellHeight) + "px");
         };
         
       };
