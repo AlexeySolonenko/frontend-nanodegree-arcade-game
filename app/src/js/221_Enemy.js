@@ -1,6 +1,21 @@
 
 
 
+gd.enemyMessages = [
+  'Hungry',
+  'Eat tummy',
+  'Smell meat',
+  'Eat human',
+  'Eat eyes',
+  'Eat brains',
+  'Crispy palms',
+  'Smell prey',
+  'I follow',
+  'Grrrr',
+  'Shshshshs',
+  'Click clack',
+  'Hot tips for tongue'
+];
 
 /*
 *
@@ -24,6 +39,7 @@
 // Place the player object in a variable called player
 
 // Enemies our player must avoid
+
 gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.sprite = sprite;
   this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;  
@@ -32,6 +48,7 @@ gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.ID = ID; // address in gd.allGameObjects array to referr to
   this.attacking = false;
   this.hasMessage = false;
+  this.speaking = false;
   gd.MovingObject.call(this,x,y,sprite,ID,this.speed,direction,type);
 };
 
@@ -58,20 +75,39 @@ gd.Enemy.prototype.cannotDoIt = function(){
 
 
 gd.Enemy.prototype.eraser = function(){
+  var enemyMessageDiv = '';
+  enemyMessageDiv = '.enemy-' + this.ID + '-html';
+  // enemyMessageDivExists = false;
+  // if($(enemyMessageDiv).html().length<2){enemyMessageDiv = false;};
+  
   if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.y > ((document.getElementsByTagName("CANVAS")[0].height) - 2*gd.cellHeight)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.x < (0 - 6*gd.cellWidth)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.y < (-gd.cellHeight*0.5)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.leftattempts > 30){
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
 };
 
@@ -292,20 +328,19 @@ gd.makeEnemySoldierWild = function(){
 */
 
   
-gd.swarmEnemies = function(){
+gd.swarmEnemies = function() {
   
   
   //for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
     
-  for(var i = 10,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3))+10;i++){
+  for(var i = 10,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3))+10;i++) {
     j++;
     if(j>(gd.numRows-3)){j=0;};
     // j++;
-    if(gd.allGameObjects[i] == 'free'){
-      
+    if(gd.allGameObjects[i] == 'free') {
       gd.allGameObjects[i] = new gd.EnemySoldier(i,((j+1)*gd.cellHeight-gd.cellHeight+gd.cellHeight*0.25),'images/enemy-bug.png',i,'right','enemy');
       //while(k!=1){
-      if(!(gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects).search('collision')==-1)){
+      if(!(gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects).search('collision')==-1)) {
         gd.allGameObjects[i].x -= gd.cellWidth;
       } else {
         k = 1;
@@ -345,28 +380,80 @@ gd.deleteEnemiesWentOutOfScreen = function(dt){
 *
 */
 
-gd.generateDivsForTooltipsOfEnemies = function(){
+gd.generateDivsForTooltipsOfEnemies = function() {
   
-  for(var i = 0; i < gd.allGameObjects.length; i++) {
-    
+  for(var i = 10; i < gd.allGameObjects.length; i++) {
     var formattedHTML = '';
-    
-    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy') && (!gd.allGameObjects[i].hasMessage)) {
+    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy')&& (gd.allGameObjects[i].hasMessage == false)) {
       gd.allGameObjects[i].hasMessage = true;
-      formattedHTML = '<div class="enemy-'+gd.allGameObjects[i].ID+
-        '-html" data-toggle="tooltip" data-placement="left" title="%data%">test</div>';
-      $('.html-atop-canvas').append(formattedHTML);
-      
-  // html-atop-canvas
+      formattedHTML = '<div class="enemy-'+gd.allGameObjects[i].ID+'-html"><b><small><span></span></small></b></div>';
+      $('.html-atop-canvas').prepend(formattedHTML);
     }; // if not free and enemy
   }; // for 
-  
-}
+};
 
-
-/**
-* 
-* END OF   ENEMY WILD CLASS
+/*
+*
+*
+* ENEMY TELL FUNCTION
+*
 *
 */
+window.hideEnemyMessage = function(div, obj) {
+    
+    setTimeout(function() {
+      $(div).css('visibility','hidden');
+      $(div).text('');
+      if(obj.hasOwnProperty('speaking')){obj.speaking = false;};
+  }, 2000);
+  
+};
+
+gd.generateEnemyMessage = function() {
+  var msg = '';
+  var rand = gd.getRandomInt(0,gd.enemyMessages.length);
+  
+  msg = gd.enemyMessages[rand];
+  return msg;
+}
+
+gd.Enemy.prototype.enemyTalking = function(msg) {  
+  var enemyMessageDiv = '.enemy-' + this.ID + '-html'; 
+  var obj = gd.allGameObjects[this.ID];
+  var ifGoingToTalk = false;
+  var rand = 0;
+  rand = gd.getRandomInt(0,200);
+  if(rand > 197){ifGoingToTalk = true;};
+  if(gd.debugKey1){console.log(this);};
+  if((this.speaking == false) && (ifGoingToTalk)) {
+    $(enemyMessageDiv + ' span').text(msg);
+    $(enemyMessageDiv).css('visibility','visible');
+    this.speaking = true;
+    window.hideEnemyMessage(enemyMessageDiv, obj);
+  };  
+};
+
+
+/*
+*
+*
+* ENEMIES TALKING
+*
+*
+*/
+
+gd.enemiesTalking = function() {
+  var msg = '';
+  for(var i = 10; i < gd.allGameObjects.length; i++) {
+    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy') && (gd.allGameObjects[i].hasMessage)) {
+      msg = gd.generateEnemyMessage();
+      gd.allGameObjects[i].enemyTalking(msg);
+    }; // if not free and enemy
+  }; // for 
+};
+
+
+
+
+
 

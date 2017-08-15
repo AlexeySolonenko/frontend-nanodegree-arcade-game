@@ -140,11 +140,39 @@ body {
 .enemy-33-html,
 .enemy-34-html,
 .enemy-35-html,
-.enemy-36-html
+.enemy-36-html,
+.enemy-10-html-tooltip,
+.enemy-11-html-tooltip,
+.enemy-12-html-tooltip,
+.enemy-13-html-tooltip,
+.enemy-14-html-tooltip,
+.enemy-15-html-tooltip,
+.enemy-16-html-tooltip,
+.enemy-17-html-tooltip,
+.enemy-18-html-tooltip,
+.enemy-19-html-tooltip,
+.enemy-20-html-tooltip,
+.enemy-21-html-tooltip,
+.enemy-22-html-tooltip,
+.enemy-23-html-tooltip,
+.enemy-24-html-tooltip,
+.enemy-25-html-tooltip,
+.enemy-26-html-tooltip,
+.enemy-27-html-tooltip,
+.enemy-28-html-tooltip,
+.enemy-29-html-tooltip,
+.enemy-30-html-tooltip,
+.enemy-31-html-tooltip,
+.enemy-32-html-tooltip,
+.enemy-33-html-tooltip,
+.enemy-34-html-tooltip,
+.enemy-35-html-tooltip,
+.enemy-36-html-tooltip
+
 {
   position: absolute;
   z-index: 507;
-
+  visibility: hidden;
 }
 
 

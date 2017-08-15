@@ -204,6 +204,13 @@ gd.resetPosRelationsOfAll = function() {
   };
 };
 
+window.hideTooltip = function(tooltip, obj,time) {
+  setTimeout(function() {
+    $(tooltip).tooltip("hide");
+    $(tooltip)[0].setAttribute('title','');
+    if(obj.hasOwnProperty('tooltipActive')){obj.tooltipActive = false;};
+  }, 5000);
+};
 
 
 

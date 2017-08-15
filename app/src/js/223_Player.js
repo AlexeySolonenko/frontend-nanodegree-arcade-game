@@ -52,46 +52,35 @@ gd.Player.prototype = Object.create(gd.MovingObject.prototype);
 gd.Player.prototype.constructor = gd.Player;
 
 
-gd.Player.prototype.update = function(dt){
+gd.Player.prototype.update = function(dt) {
   
 };
 
   
 gd.Player.prototype.speed = 1;
-gd.Player.prototype.cannotDoIt = function(){
+gd.Player.prototype.cannotDoIt = function() {
   
 };
 
-gd.Player.prototype.returnToStart = function(){
-  this.beingCongratulated = false;
-  this.x = gd.cellWidth*2;
-  this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
-  this.health = 20;
-};
 
-gd.Player.prototype.dying = function(){
-  // $(this).css('visibility','none');
-  this.returnToStart();
-};
  
- 
-gd.Player.prototype.render = function(){
+gd.Player.prototype.render = function() {
   gd.allGameObjects[0].sprite=gd.playerActiveSprite;
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
 
 
 
-gd.Player.prototype.moveLeft = function(){
+gd.Player.prototype.moveLeft = function() {
   var noObstacleAtLeft = false;
   noObstacleAtLeft = gd.notBlockedNoEnemy1(this.leftNeighbourArr);;
-  if( ((this.x - 0.9*gd.cellWidth)>0)&&noObstacleAtLeft){
+  if( ((this.x - 0.9*gd.cellWidth)>0)&&noObstacleAtLeft) {
       this.x = this.x-gd.cellWidth*gd.movementFrozen;
   }
   else {this.cannotDoIt();};
 };
 
-gd.Player.prototype.moveRight = function(){
+gd.Player.prototype.moveRight = function() {
   var noObstacleAtRight = false;
   noObstacleAtRight = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
   var notBeyondRightBorder = false;
@@ -128,6 +117,19 @@ gd.Player.prototype.moveDown = function() {
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
 
+gd.Player.prototype.returnToStart = function() {
+  this.beingCongratulated = false;
+  this.x = gd.cellWidth*2;
+  this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
+  this.health = 20;
+  // this.moveDown();
+};
+
+gd.Player.prototype.dying = function() {
+  // $(this).css('visibility','none');
+  this.returnToStart();
+};
+ 
 
 
 gd.Player.prototype.handleInput = function(key) {
@@ -143,13 +145,7 @@ gd.Player.prototype.handleInput = function(key) {
 };
 
 
-window.hidePlayer0Message = function() {
-  setTimeout(function() {
-    $('.player-html').tooltip("hide");
-    $('.player-html')[0].setAttribute('title','');  
-  }, 5000);
-  
-};
+
 
 
 gd.Player.prototype.tell = function(msg) {
@@ -167,11 +163,10 @@ gd.Player.prototype.tell = function(msg) {
     newMsg = msg;
   };
   
-  //$('.player-html')[0].setAttribute('title',newMsg);
 
   if(!oneToolTipAlreadyActive) {
     $('.player-html').tooltip("show");
-    window.hidePlayer0Message();
+    window.hideTooltip('.player-html',gd.allGameObjects[0],5000);
   };
   
   if(newMsg.length>20) {
@@ -219,12 +214,17 @@ gd.Player.prototype.checkForWin = function() {
     '. Get ready for next challenge! Good luck!';
   
   if(result[1] && (gd.framesCounter > 2) && (!this.beingCongratulated)) {
-    if(gd.debugKey1){console.log('won');};
+    this.beingCongratulated = true;
+    this.moveDown();
+    this.returnToStart();
+    this.moveDown();
+    gd.pause();
+    
     $('.modal-congrats .modal-body > div').html('');
     $('.modal-congrats .modal-body > div').html(winMsg);
     $('.modal-congrats').modal('show');
-    this.beingCongratulated = true;
-    this.returnToStart();
+
+    
   };
   // modal-congrats-btn-next
   // modal-congrats-btn-same

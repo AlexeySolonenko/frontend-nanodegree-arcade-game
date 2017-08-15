@@ -422,6 +422,13 @@ gd.resetPosRelationsOfAll = function() {
   };
 };
 
+window.hideTooltip = function(tooltip, obj,time) {
+  setTimeout(function() {
+    $(tooltip).tooltip("hide");
+    $(tooltip)[0].setAttribute('title','');
+    if(obj.hasOwnProperty('tooltipActive')){obj.tooltipActive = false;};
+  }, 5000);
+};
 
 
 
@@ -987,6 +994,21 @@ gd.blockedOrEnemy1 = function(arr){
 
 
 
+gd.enemyMessages = [
+  'Hungry',
+  'Eat tummy',
+  'Smell meat',
+  'Eat human',
+  'Eat eyes',
+  'Eat brains',
+  'Crispy palms',
+  'Smell prey',
+  'I follow',
+  'Grrrr',
+  'Shshshshs',
+  'Click clack',
+  'Hot tips for tongue'
+];
 
 /*
 *
@@ -1010,6 +1032,7 @@ gd.blockedOrEnemy1 = function(arr){
 // Place the player object in a variable called player
 
 // Enemies our player must avoid
+
 gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.sprite = sprite;
   this.x = 0 - gd.getRandomInt(1,5)*gd.cellWidth;  
@@ -1018,6 +1041,7 @@ gd.Enemy = function(x,y,sprite,ID,direction,type) {
   this.ID = ID; // address in gd.allGameObjects array to referr to
   this.attacking = false;
   this.hasMessage = false;
+  this.speaking = false;
   gd.MovingObject.call(this,x,y,sprite,ID,this.speed,direction,type);
 };
 
@@ -1044,20 +1068,39 @@ gd.Enemy.prototype.cannotDoIt = function(){
 
 
 gd.Enemy.prototype.eraser = function(){
+  var enemyMessageDiv = '';
+  enemyMessageDiv = '.enemy-' + this.ID + '-html';
+  // enemyMessageDivExists = false;
+  // if($(enemyMessageDiv).html().length<2){enemyMessageDiv = false;};
+  
   if(this.x > ((document.getElementsByTagName("CANVAS")[0].width) - gd.cellWidth)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.y > ((document.getElementsByTagName("CANVAS")[0].height) - 2*gd.cellHeight)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.x < (0 - 6*gd.cellWidth)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.y < (-gd.cellHeight*0.5)) {
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
+  
   if(this.leftattempts > 30){
     gd.allGameObjects[this.ID] = 'free';
+    if(enemyMessageDiv){$(enemyMessageDiv).remove();};
+    $(enemyMessageDiv).remove();
   };
 };
 
@@ -1278,20 +1321,19 @@ gd.makeEnemySoldierWild = function(){
 */
 
   
-gd.swarmEnemies = function(){
+gd.swarmEnemies = function() {
   
   
   //for(var i = 10,j=0, k=0;i<(4+gd.getRandomInt(0,1))+10;i++){
     
-  for(var i = 10,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3))+10;i++){
+  for(var i = 10,j=0, k=0;i<((gd.numRows-2)+gd.getRandomInt(0,3))+10;i++) {
     j++;
     if(j>(gd.numRows-3)){j=0;};
     // j++;
-    if(gd.allGameObjects[i] == 'free'){
-      
+    if(gd.allGameObjects[i] == 'free') {
       gd.allGameObjects[i] = new gd.EnemySoldier(i,((j+1)*gd.cellHeight-gd.cellHeight+gd.cellHeight*0.25),'images/enemy-bug.png',i,'right','enemy');
       //while(k!=1){
-      if(!(gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects).search('collision')==-1)){
+      if(!(gd.checkCollisions(gd.allGameObjects[i],gd.allGameObjects).search('collision')==-1)) {
         gd.allGameObjects[i].x -= gd.cellWidth;
       } else {
         k = 1;
@@ -1331,30 +1373,82 @@ gd.deleteEnemiesWentOutOfScreen = function(dt){
 *
 */
 
-gd.generateDivsForTooltipsOfEnemies = function(){
+gd.generateDivsForTooltipsOfEnemies = function() {
   
-  for(var i = 0; i < gd.allGameObjects.length; i++) {
-    
+  for(var i = 10; i < gd.allGameObjects.length; i++) {
     var formattedHTML = '';
-    
-    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy') && (!gd.allGameObjects[i].hasMessage)) {
+    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy')&& (gd.allGameObjects[i].hasMessage == false)) {
       gd.allGameObjects[i].hasMessage = true;
-      formattedHTML = '<div class="enemy-'+gd.allGameObjects[i].ID+
-        '-html" data-toggle="tooltip" data-placement="left" title="%data%">test</div>';
-      $('.html-atop-canvas').append(formattedHTML);
-      
-  // html-atop-canvas
+      formattedHTML = '<div class="enemy-'+gd.allGameObjects[i].ID+'-html"><b><small><span></span></small></b></div>';
+      $('.html-atop-canvas').prepend(formattedHTML);
     }; // if not free and enemy
   }; // for 
-  
-}
+};
 
-
-/**
-* 
-* END OF   ENEMY WILD CLASS
+/*
+*
+*
+* ENEMY TELL FUNCTION
+*
 *
 */
+window.hideEnemyMessage = function(div, obj) {
+    
+    setTimeout(function() {
+      $(div).css('visibility','hidden');
+      $(div).text('');
+      if(obj.hasOwnProperty('speaking')){obj.speaking = false;};
+  }, 2000);
+  
+};
+
+gd.generateEnemyMessage = function() {
+  var msg = '';
+  var rand = gd.getRandomInt(0,gd.enemyMessages.length);
+  
+  msg = gd.enemyMessages[rand];
+  return msg;
+}
+
+gd.Enemy.prototype.enemyTalking = function(msg) {  
+  var enemyMessageDiv = '.enemy-' + this.ID + '-html'; 
+  var obj = gd.allGameObjects[this.ID];
+  var ifGoingToTalk = false;
+  var rand = 0;
+  rand = gd.getRandomInt(0,200);
+  if(rand > 197){ifGoingToTalk = true;};
+  if(gd.debugKey1){console.log(this);};
+  if((this.speaking == false) && (ifGoingToTalk)) {
+    $(enemyMessageDiv + ' span').text(msg);
+    $(enemyMessageDiv).css('visibility','visible');
+    this.speaking = true;
+    window.hideEnemyMessage(enemyMessageDiv, obj);
+  };  
+};
+
+
+/*
+*
+*
+* ENEMIES TALKING
+*
+*
+*/
+
+gd.enemiesTalking = function() {
+  var msg = '';
+  for(var i = 10; i < gd.allGameObjects.length; i++) {
+    if((gd.allGameObjects[i] != 'free') && (gd.allGameObjects[i].type == 'enemy') && (gd.allGameObjects[i].hasMessage)) {
+      msg = gd.generateEnemyMessage();
+      gd.allGameObjects[i].enemyTalking(msg);
+    }; // if not free and enemy
+  }; // for 
+};
+
+
+
+
+
 
 
 
@@ -1411,46 +1505,35 @@ gd.Player.prototype = Object.create(gd.MovingObject.prototype);
 gd.Player.prototype.constructor = gd.Player;
 
 
-gd.Player.prototype.update = function(dt){
+gd.Player.prototype.update = function(dt) {
   
 };
 
   
 gd.Player.prototype.speed = 1;
-gd.Player.prototype.cannotDoIt = function(){
+gd.Player.prototype.cannotDoIt = function() {
   
 };
 
-gd.Player.prototype.returnToStart = function(){
-  this.beingCongratulated = false;
-  this.x = gd.cellWidth*2;
-  this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
-  this.health = 20;
-};
 
-gd.Player.prototype.dying = function(){
-  // $(this).css('visibility','none');
-  this.returnToStart();
-};
  
- 
-gd.Player.prototype.render = function(){
+gd.Player.prototype.render = function() {
   gd.allGameObjects[0].sprite=gd.playerActiveSprite;
   ctx.drawImage(Resources.get(this.sprite),this.x,this.y,gd.spriteWidth,gd.spriteHeight);
 };
 
 
 
-gd.Player.prototype.moveLeft = function(){
+gd.Player.prototype.moveLeft = function() {
   var noObstacleAtLeft = false;
   noObstacleAtLeft = gd.notBlockedNoEnemy1(this.leftNeighbourArr);;
-  if( ((this.x - 0.9*gd.cellWidth)>0)&&noObstacleAtLeft){
+  if( ((this.x - 0.9*gd.cellWidth)>0)&&noObstacleAtLeft) {
       this.x = this.x-gd.cellWidth*gd.movementFrozen;
   }
   else {this.cannotDoIt();};
 };
 
-gd.Player.prototype.moveRight = function(){
+gd.Player.prototype.moveRight = function() {
   var noObstacleAtRight = false;
   noObstacleAtRight = gd.notBlockedNoEnemy1(this.rightNeighbourArr);
   var notBeyondRightBorder = false;
@@ -1487,6 +1570,19 @@ gd.Player.prototype.moveDown = function() {
 };
 // <pattern id="p" patternUnits="userSpaceOnUse" x="-22.8" y="-21.6" width="56.3" height="73">
 
+gd.Player.prototype.returnToStart = function() {
+  this.beingCongratulated = false;
+  this.x = gd.cellWidth*2;
+  this.y = gd.numRows*gd.cellHeight - gd.cellHeight*1.75;
+  this.health = 20;
+  // this.moveDown();
+};
+
+gd.Player.prototype.dying = function() {
+  // $(this).css('visibility','none');
+  this.returnToStart();
+};
+ 
 
 
 gd.Player.prototype.handleInput = function(key) {
@@ -1502,13 +1598,7 @@ gd.Player.prototype.handleInput = function(key) {
 };
 
 
-window.hidePlayer0Message = function() {
-  setTimeout(function() {
-    $('.player-html').tooltip("hide");
-    $('.player-html')[0].setAttribute('title','');  
-  }, 5000);
-  
-};
+
 
 
 gd.Player.prototype.tell = function(msg) {
@@ -1526,11 +1616,10 @@ gd.Player.prototype.tell = function(msg) {
     newMsg = msg;
   };
   
-  //$('.player-html')[0].setAttribute('title',newMsg);
 
   if(!oneToolTipAlreadyActive) {
     $('.player-html').tooltip("show");
-    window.hidePlayer0Message();
+    window.hideTooltip('.player-html',gd.allGameObjects[0],5000);
   };
   
   if(newMsg.length>20) {
@@ -1578,12 +1667,17 @@ gd.Player.prototype.checkForWin = function() {
     '. Get ready for next challenge! Good luck!';
   
   if(result[1] && (gd.framesCounter > 2) && (!this.beingCongratulated)) {
-    if(gd.debugKey1){console.log('won');};
+    this.beingCongratulated = true;
+    this.moveDown();
+    this.returnToStart();
+    this.moveDown();
+    gd.pause();
+    
     $('.modal-congrats .modal-body > div').html('');
     $('.modal-congrats .modal-body > div').html(winMsg);
     $('.modal-congrats').modal('show');
-    this.beingCongratulated = true;
-    this.returnToStart();
+
+    
   };
   // modal-congrats-btn-next
   // modal-congrats-btn-same
@@ -1646,7 +1740,7 @@ gd.positionHoveringItems = function() {
         
         
         if(gd.allGameObjects[i].hasMessage == true) {
-          if(gd.debugKey1){console.log('hello');};
+          
           $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('left',(gd.allGameObjects[i].x + gd.cellWidth) + "px");
           $('.enemy-' + gd.allGameObjects[i].ID + '-html ').css('top',(gd.allGameObjects[i].y + gd.cellHeight) + "px");
         };
@@ -1892,7 +1986,8 @@ var Engine = (function(global) {
     gd.positionHoverDiv();
     gd.updateHoveringItems();
     gd.positionHoveringItems();
-     
+    gd.enemiesTalking();
+    
     gd.renderTiles(ctx,canvas);
     gd.landscape.renderAll();
     gd.renderEntities();

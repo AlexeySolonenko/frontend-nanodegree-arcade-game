@@ -141,7 +141,8 @@ var Engine = (function(global) {
     gd.positionHoverDiv();
     gd.updateHoveringItems();
     gd.positionHoveringItems();
-     
+    gd.enemiesTalking();
+    
     gd.renderTiles(ctx,canvas);
     gd.landscape.renderAll();
     gd.renderEntities();
